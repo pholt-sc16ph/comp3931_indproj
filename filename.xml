@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!---->
+<Connectivity>
+  <Node>
+    <Switch/>
+  </Node>
+  <TrackSections>
+    <TrackSection/>
+  </TrackSections>
+</Connectivity>
