@@ -1,6 +1,8 @@
 #!/usr/bin/python
 from lxml import etree 
 import copy
+import graphs
+
 
 def Connectivity():
     version = "1.0"
@@ -36,7 +38,8 @@ def Connectivity():
         popped = editable_nodes[0].pop(0)
         etree.SubElement(nodes, "Switch", id=popped, type="Unknown", track=str(i))
         
-    # print(editable_nodes[0].pop(0))
+    
+    # table_nodes[0].pop(0))
     print(editable_nodes[0])
     etree.SubElement(track_sec, "TrackSection")
 
@@ -47,8 +50,6 @@ def Connectivity():
     tree = etree.ElementTree(root)
     tree.write("Connectivity.xml", pretty_print=True, xml_declaration=True, encoding='UTF-8')
     return
-
-
 
 def Geographic():
     #create top level "Connectivity"

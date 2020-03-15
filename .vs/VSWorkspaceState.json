@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\GraphMatchingSoftware_CL",
+    "\\GraphMatchingSoftware_CL\\include"
   ],
-  "SelectedNode": "\\GraphMatchingSoftware_CL",
+  "SelectedNode": "\\GraphMatchingSoftware_CL\\GraphMatchingSoftware_CL.cpp",
   "PreviewInSolutionExplorer": false
 }

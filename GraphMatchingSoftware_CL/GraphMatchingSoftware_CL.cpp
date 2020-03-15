@@ -2,10 +2,16 @@
 //
 
 #include <iostream>
+#include "include/rapidxml.hpp"
+#include "include/rapidxml_iterators.hpp"
+#include "include/rapidxml_print.hpp"
+#include "include/rapidxml_utils.hpp"
 
 int main()
 {
     std::cout << "Hello World!\n";
+    xml_document<> doc;    // character type defaults to char
+    doc.parse<0>(text);    // 0 means default parse flags
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
