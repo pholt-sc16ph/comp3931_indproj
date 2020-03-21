@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Connectivity version="1.0" xmlns="https://www.tracsis.com/infrastructure">
+  <Nodes>
+    <LimitOfNetwork id="0"/>
+    <Crossing id="1"/>
+    <Crossing id="2"/>
+    <Switch id="3"/>
+    <Switch id="4"/>
+    <LimitOfNetwork id="5"/>
+    <LimitOfNetwork id="6"/>
+    <LimitOfNetwork id="7"/>
+    <LimitOfNetwork id="8"/>
+    <LimitOfNetwork id="9"/>
+  </Nodes>
+  <TrackSections>
+    <TrackSection id="0"/>
+    <TrackSection id="1"/>
+    <TrackSection id="2"/>
+    <TrackSection id="3"/>
+    <TrackSection id="4"/>
+    <TrackSection id="5"/>
+    <TrackSection id="6"/>
+    <TrackSection id="7"/>
+    <TrackSection id="8"/>
+    <TrackSection id="9"/>
+  </TrackSections>
+</Connectivity>
