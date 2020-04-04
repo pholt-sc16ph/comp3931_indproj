@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Connectivity version="1.0" xmlns="https://www.tracsis.com/infrastructure">
+  <Nodes>
+    <LimitOfNetwork id="28" type="Unknown" track="2037-2038-63739-2035-2036" />
+    <LimitOfNetwork id="36" type="Unknown" track="2037-2038-63739-2035-2036" />
+  </Nodes>
+  <TrackSections>
+    <TrackSection id="2037-2038-63739-2035-2036" length="299" startNode="36" endNode="28" />
+  </TrackSections>
+</Connectivity>
