@@ -8,3 +8,4 @@ pip install networkx
 pip install matplotlib
 pip install random
 pip install lxml
+pip install pygraphviz
