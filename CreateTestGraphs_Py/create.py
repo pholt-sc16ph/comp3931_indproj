@@ -3,6 +3,7 @@ import copy
 import random
 import os
 import zipfile
+import shutil
 
 
 import matplotlib.pyplot as plt
@@ -10,9 +11,11 @@ import networkx as nx
 from lxml import etree
 
 from graph_orig import createGraph
+from graph_edit import graph_edit, changes_dict
 from editxml import replace_in
 from writeGeo import writeGeo
 from writeCon import writeCon
+from writeInfo import print_info
 
 
 
@@ -32,41 +35,51 @@ crossing_number = 0
 number_differences = 0
 
 while True:
-    switch_number = 3
-    crossing_number = 3
-    # switch_number = input ("Choose number of switch nodes in set one: ")
-    # crossing_number = input ("Choose number of crossing nodes in set one: ")
-    # number_differences = input ("Choose the number of differences between set one and set two: ")
+    # dummy_number = 3
+    # switch_number = 3
+    # crossing_number = 3
+    # number_differences = 1
+    dummy_number = input ("Choose number of dummy nodes in original graph: ")
+    switch_number = input ("Choose number of switch nodes in original graph: ")
+    crossing_number = input ("Choose number of crossing nodes in original graph: ")
+    number_differences = input ("Choose the number of differences between original graph and edited graph: ")
     break  
+
+"""
+Create original graph and write to a new folder in /Data/automated_tests. The new folder will be named to detail the
+graphs it contains. An example folder name would be:
+"/Data/automated_tests/1-dummy_2-switches_2-crossings_1-changes_45633" (number on the end is a random unique ID to allow 
+folders with the same criteria to be created).
+Inside this folder will have two .orb files, one named original.orb and one named edited.orb, and a .txt file named changes.txt
+containing the differences between the two graphs. 
+An example of the text file would look like:
+
+2 changes:
+node number: 4("LimitOfNetwork") swapped with node number: 4("Switch") - nodes created as a result: 15("LimitOfNetwork") and 16("LimitOfNetwork")
+node number: 7("Switch") deleted - nodes deleted as a result: 9("LimitOfNetwork") and 10("LimitOfNetwork")
+
+"""
+path_to_automated_tests = "../Data/automated_tests/"
+random_file_number = random.randint(100000, 999999)
+directory_string = str(dummy_number) + "-dummy_" + str(switch_number) + "-switch_" + str(crossing_number) + "-crossings_" + str(number_differences) + "-changes_" + str(random_file_number)
+new_directory = path_to_automated_tests + directory_string
+os.makedirs(new_directory)
 
 
 # G is the main graph produced, this is different each time create.py is run
-G = createGraph(int(switch_number), int(crossing_number))
+G = createGraph(int(dummy_number),int(switch_number), int(crossing_number))
 number_of_nodes = G.number_of_nodes()
 G.nodes(data=True)
-print(nx.info(G))
-
-
-
-
 # use graph created to write Connectivity.xml
 # writeCon() returns a dictionary for use in writeGeo()
-track_dict = writeCon(G)
+track_dict_original = writeCon(G)
 # use graph created to write Geographic.xml and place in Layout folder
-writeGeo(G, number_of_nodes, track_dict)
+writeGeo(G, number_of_nodes, track_dict_original)
 
-
-"""display G using matplotlib (this won't be the same visually as the graph dsiplayed in TPSDataviewer)"""
-# nx.draw(G, with_labels=True, font_weight='bold')
-# plt.show()
-
-"""call function to replace "in_" with "in" in the Connectivity.xml file"""
+#call function to replace "in_" with "in" in the Connectivity.xml file
 replace_in()
 
-random_file_number = random.randint(10000, 99999)
-dynamic_file_name = "s-" + str(switch_number) + "c-" + str(crossing_number) + "_id-" + str(random_file_number)
-
-zfName = dynamic_file_name + ".zip"
+zfName = "original_graph.zip"
 foo = zipfile.ZipFile(zfName, 'w')
 foo.write("Connectivity.xml")
 # Adding files from directory 'files'
@@ -75,6 +88,38 @@ for root, dirs, files in os.walk('Layout'):
         foo.write(os.path.join(root, f))
 foo.close()
 
+pre, ext = os.path.splitext(zfName)
+os.rename(zfName, pre + ".orb")
+
+os.remove("Connectivity.xml")
+os.remove("Layout/Geographic.xml")
+os.removedirs("Layout")
+
+shutil.move('original_graph.orb', new_directory)
+
+
+F = graph_edit(G, int(number_differences))
+number_of_nodes = F.number_of_nodes()
+F.nodes(data=True)
+# use graph created to write Connectivity.xml
+# writeCon() returns a dictionary for use in writeGeo()
+track_dict_edited = writeCon(F)
+# use graph created to write Geographic.xml and place in Layout folder
+writeGeo(F, number_of_nodes, track_dict_edited)
+
+
+#call function to replace "in_" with "in" in the Connectivity.xml file
+replace_in()
+
+
+zfName = "edited_graph.zip"
+foo = zipfile.ZipFile(zfName, 'w')
+foo.write("Connectivity.xml")
+# Adding files from directory 'files'
+for root, dirs, files in os.walk('Layout'):
+    for f in files:
+        foo.write(os.path.join(root, f))
+foo.close()
 
 pre, ext = os.path.splitext(zfName)
 os.rename(zfName, pre + ".orb")
@@ -82,3 +127,27 @@ os.rename(zfName, pre + ".orb")
 os.remove("Connectivity.xml")
 os.remove("Layout/Geographic.xml")
 os.removedirs("Layout")
+
+shutil.move('edited_graph.orb', new_directory)
+
+
+
+print_info(changes_dict)
+""" to display graphs uncomment the below code """
+"""
+#display both graphs for troubleshooting
+elarge1 =[(u,v) for (u,v,d) in G.edges(data=True)]
+pos1=nx.spring_layout(G)
+nx.draw(G,pos1, with_labels=True, font_weight='bold')
+plt.show(block=False) 
+plt.draw()
+
+elarge2 =[(u,v) for (u,v,d) in F.edges(data=True)]
+pos2=nx.spring_layout(F)
+for k,v in pos2.items():
+    # Shift the x values of every node by 3 to the right
+    v[0] = v[0] +3
+nx.draw(F,pos2, with_labels=True, font_weight='bold')
+plt.show() # display
+plt.draw()
+"""

@@ -41,6 +41,10 @@ def writeGeo(graph, num_nodes, track_dict):
         Geo_edgeID = Geo_edgeID + 1
 
     #need to create the "Layout" directory to save Geographic.xml in to
-    os.mkdir("Layout")
-    et_Geographic = etree.ElementTree(root_Geographic)
-    et_Geographic.write("Layout/Geographic.xml", encoding='utf-8', xml_declaration=True, pretty_print=True)
+    if os.path.exists("Layout"):
+        et_Geographic = etree.ElementTree(root_Geographic)
+        et_Geographic.write("Layout/Geographic-edited.xml", encoding='utf-8', xml_declaration=True, pretty_print=True)
+    else:
+        os.mkdir("Layout")
+        et_Geographic = etree.ElementTree(root_Geographic)
+        et_Geographic.write("Layout/Geographic.xml", encoding='utf-8', xml_declaration=True, pretty_print=True)

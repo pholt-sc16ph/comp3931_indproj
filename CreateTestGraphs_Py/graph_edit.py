@@ -3,35 +3,37 @@ import matplotlib.pyplot as plt
 import random
 
 
-from graph_orig import createGraph
+changes_dict = {}
 
-
-mainGraph = createGraph(3, 3)
-
-def graph_orig(graph):
-    G = graph
-    print("Data and graph for G")
-    G.nodes(data=True)
-    print(nx.info(G)) 
-    print("\n")
-    return G
 
 def graph_edit(graph, no_of_changes):
     F = graph
     
     list_of_nodes = list(F.nodes())    
     for x in range(0, no_of_changes):
+        temp_dict = {}
         random_node = random.choice(list_of_nodes)
+
+        #for record keeping
+        random_node_type = F.nodes[random_node]['type']
+        random_node_info_for_dict = (random_node, random_node_type)
+        list_of_nodes_added_during_change = []
+        list_of_nodes_deleted_during_change = []
+        #end of record keeping
+        
         random_node_degree = F.degree(random_node)
         list_of_nodes.remove(random_node)
         number_of_nodes = F.number_of_nodes()
         random_node_neighbors = list(F.neighbors(random_node))
-        random_choice_list = [1, 2, 5]
+        random_choice_list = ["swapwithlimit", "adddummynode", "swapwithdummynode", "swapwithswitchnode", "swapwithcrossingnode", "deletenode"]
         random_action = random.choice(random_choice_list)
-        print("Random action: " + str(random_action))
-        print("Node to be acted upon: " + str(random_node))
-        #if 1 swap with limit node
-        if random_action == 1:
+
+        #code for adding to dictionary for record keeping
+        temp_dict['action_completed'] = random_action
+        temp_dict['node_acted_upon'] = random_node_info_for_dict
+        #end of record keeping
+
+        if random_action == "swapwithlimit":
             F.remove_node(random_node)
             lost_nodes = []
             for node in F:
@@ -39,26 +41,178 @@ def graph_edit(graph, no_of_changes):
                         lost_nodes.append(node)
             if len(lost_nodes) > 0:
                     for item in lost_nodes:
+                        #code for adding to dictionary for record keeping
+                        deleted_node_type = F.nodes[item]['type']
+                        deleted_node_info_for_dict = (item, deleted_node_type)
+                        list_of_nodes_deleted_during_change.append(deleted_node_info_for_dict)
+                        #end of record keeping
                         F.remove_node(item)
                         random_node_neighbors.remove(item)
-            F.add_node(random_node)
+
+            F.add_node(random_node, type="LimitOfNetwork")
+            random_node_type = F.nodes[random_node]['type']
+            random_node_info_for_dict = (random_node, random_node_type)
+            temp_dict['node_swapped_or_added'] = random_node_info_for_dict
             F.add_edge(random_node, random.choice(random_node_neighbors))
-        #if 2 add in a dummy node between two nodes
-        if random_action == 2:
+        if random_action == "adddummynode":
             choose_random_neighbour = random.choice(random_node_neighbors)
             F.remove_edge(random_node, choose_random_neighbour)
             new_node = number_of_nodes
-            F.add_node(new_node)
+            F.add_node(new_node, type="DummyNode")
+            random_node_type = F.nodes[new_node]['type']
+            random_node_info_for_dict = (new_node, random_node_type)
+            temp_dict['node_swapped_or_added'] = random_node_info_for_dict
             F.add_edge(new_node, random_node)
             F.add_edge(new_node, choose_random_neighbour)
-        #if 3 swap with dummy node
+        if random_action == "swapwithdummynode":
+            if len(random_node_neighbors) > 1:
+                F.remove_node(random_node)
+                F.add_node(random_node, type="DummyNode")
+                random_node_type = F.nodes[random_node]['type']
+                random_node_info_for_dict = (random_node, random_node_type)
+                temp_dict['node_swapped_or_added'] = random_node_info_for_dict
+                choose_random_neighbour = random.choice(random_node_neighbors)
+                F.add_edge(random_node, choose_random_neighbour)
+                random_node_neighbors.remove(choose_random_neighbour)
+                choose_random_neighbour = random.choice(random_node_neighbors)
+                F.add_edge(random_node, choose_random_neighbour)
+            elif len(random_node_neighbors) == 1:
+                F.remove_node(random_node)
+                F.add_node(random_node, type="DummyNode")
 
-        #if 4 swap with switch node
+                #code for adding to dictionary for record keeping
+                random_node_type = F.nodes[random_node]['type']
+                random_node_info_for_dict = (random_node, random_node_type)
+                temp_dict['node_swapped_or_added'] = random_node_info_for_dict
+                #end of record keeping
 
+                original_neighbor = random_node_neighbors[0]
+                new_node = number_of_nodes
+                F.add_node(new_node, type="LimitOfNetwork")
+
+                #code for adding to dictionary for record keeping
+                new_node_type = F.nodes[new_node]['type']
+                new_node_info_for_dict = (new_node, new_node_type)
+                list_of_nodes_added_during_change.append(new_node_info_for_dict)
+                #end of record keeping
+
+                F.add_edge(random_node, original_neighbor)
+                F.add_edge(random_node, new_node)
+            lost_nodes = []
+            for node in F:
+                    if F.degree(node) == 0:
+                        lost_nodes.append(node)
+            if len(lost_nodes) > 0:
+                    for item in lost_nodes:
+                        #code for adding to dictionary for record keeping
+                        deleted_node_type = F.nodes[item]['type']
+                        deleted_node_info_for_dict = (item, deleted_node_type)
+                        list_of_nodes_deleted_during_change.append(deleted_node_info_for_dict)
+                        #end of record keeping
+                        F.remove_node(item)
+        if random_action == "swapwithswitchnode":
+            if len(random_node_neighbors) == 1:
+                F.remove_node(random_node)
+                F.add_node(random_node, type="Switch")
+
+                #code for adding to dictionary for record keeping
+                random_node_type = F.nodes[random_node]['type']
+                random_node_info_for_dict = (random_node, random_node_type)
+                temp_dict['node_swapped_or_added'] = random_node_info_for_dict
+                #end of record keeping
+
+                original_neighbor = random_node_neighbors[0]
+                new_node = number_of_nodes
+                new_node_plus_one = number_of_nodes + 1
+                F.add_node(new_node, type="LimitOfNetwork")
+                F.add_node(new_node_plus_one, type="LimitOfNetwork")
+
+                #code for adding to dictionary for record keeping
+                new_node_type = F.nodes[new_node]['type']
+                new_node_info_for_dict1 = (new_node, new_node_type)
+                new_node_type = F.nodes[new_node_plus_one]['type']
+                new_node_info_for_dict2 = (new_node_plus_one, new_node_type)
+                list_of_nodes_added_during_change.append(new_node_info_for_dict1)
+                list_of_nodes_added_during_change.append(new_node_info_for_dict2)
+                #end of record keeping
+
+                F.add_edge(random_node, original_neighbor)
+                F.add_edge(random_node, new_node)
+                F.add_edge(random_node, new_node_plus_one)
+            if len(random_node_neighbors) == 2:
+                F.remove_node(random_node)
+                F.add_node(random_node, type="Switch")
+                choose_random_neighbour = random.choice(random_node_neighbors)
+                F.add_edge(random_node, choose_random_neighbour)
+                random_node_neighbors.remove(choose_random_neighbour)
+                choose_random_neighbour = random.choice(random_node_neighbors)
+                F.add_edge(random_node, choose_random_neighbour)
+                new_node = number_of_nodes
+                F.add_node(new_node, type="LimitOfNetwork")
+                F.add_edge(random_node, new_node)
+            if len(random_node_neighbors) == 3:
+                #already a switch no point completing computation
+                dummy = 0
+            if len(random_node_neighbors) == 4:
+                F.remove_node(random_node)
+                F.add_node(random_node, type="Switch")
+                choose_random_neighbour = random.choice(random_node_neighbors)
+                F.add_edge(random_node, choose_random_neighbour)
+                random_node_neighbors.remove(choose_random_neighbour)
+                choose_random_neighbour = random.choice(random_node_neighbors)
+                F.add_edge(random_node, choose_random_neighbour)
+                random_node_neighbors.remove(choose_random_neighbour)
+                choose_random_neighbour = random.choice(random_node_neighbors)
+                F.add_edge(random_node, choose_random_neighbour)
         #if 5 swap with crossing node
-
+        if random_action == "swapwithcrossingnode":
+            if len(random_node_neighbors) == 1:
+                F.remove_node(random_node)
+                F.add_node(random_node, type="FlatCrossing")
+                original_neighbor = random_node_neighbors[0]
+                new_node = number_of_nodes
+                new_node_plus_one = number_of_nodes + 1
+                new_node_plus_two = number_of_nodes + 2
+                F.add_node(new_node, type="LimitOfNetwork")
+                F.add_node(new_node_plus_one, type="LimitOfNetwork")
+                F.add_node(new_node_plus_two, type="LimitOfNetwork")
+                F.add_edge(random_node, original_neighbor)
+                F.add_edge(random_node, new_node)
+                F.add_edge(random_node, new_node_plus_one)
+                F.add_edge(random_node, new_node_plus_two)
+            if len(random_node_neighbors) == 2:
+                F.remove_node(random_node)
+                F.add_node(random_node, type="FlatCrossing")
+                choose_random_neighbour = random.choice(random_node_neighbors)
+                F.add_edge(random_node, choose_random_neighbour)
+                random_node_neighbors.remove(choose_random_neighbour)
+                choose_random_neighbour = random.choice(random_node_neighbors)
+                F.add_edge(random_node, choose_random_neighbour)
+                new_node = number_of_nodes
+                new_node_plus_one = number_of_nodes + 1
+                F.add_node(new_node_plus_one, type="LimitOfNetwork")
+                F.add_node(new_node, type="LimitOfNetwork")
+                F.add_edge(random_node, new_node)
+                F.add_edge(random_node, new_node_plus_one)
+            if len(random_node_neighbors) == 3:
+                F.remove_node(random_node)
+                F.add_node(random_node, type="FlatCrossing")
+                choose_random_neighbour = random.choice(random_node_neighbors)
+                F.add_edge(random_node, choose_random_neighbour)
+                random_node_neighbors.remove(choose_random_neighbour)
+                choose_random_neighbour = random.choice(random_node_neighbors)
+                F.add_edge(random_node, choose_random_neighbour)
+                random_node_neighbors.remove(choose_random_neighbour)
+                choose_random_neighbour = random.choice(random_node_neighbors)
+                F.add_edge(random_node, choose_random_neighbour)
+                new_node = number_of_nodes
+                F.add_node(new_node, type="LimitOfNetwork")
+                F.add_edge(random_node, new_node)
+            if len(random_node_neighbors) == 4:
+                #already a crossing so no need to complete computation
+                dummy = 0
         #if 6 just remove node
-        if random_action == 6:
+        if random_action == "deletenode":
             F.remove_node(random_node)
             random_choice_list_6 = [0, 1]
             random_choice_6 = random.choice(random_choice_list_6)
@@ -82,39 +236,101 @@ def graph_edit(graph, no_of_changes):
                     F.add_edge(lost_nodes[0], random_node_neighbors[1])
                     F.add_edge(lost_nodes[1], random_node_neighbors[0])
                     F.add_edge(lost_nodes[1], random_node_neighbors[1])
+        # print("Remove nodes which satisfy type and degree")
+        for node in F:
+            if F.nodes[node]['type'] == 'Switch' and F.degree[node] == 3:
+                # print("Remove: G.nodes[node]['type'] == 'Switch' and G.degree[node] == 3")
+                if node in list_of_nodes:
+                    list_of_nodes.remove(node)
+            elif F.nodes[node]['type'] == 'FlatCrossing' and F.degree[node] == 4:
+                # print("Remove: G.nodes[node]['type'] == 'FlatCrossing' and G.degree[node] == 4")
+                if node in list_of_nodes:
+                    list_of_nodes.remove(node)
+            elif F.nodes[node]['type'] == 'DummyNode' and F.degree[node] == 2:
+                # print("Remove: G.nodes[node]['type'] == 'DummyNode' and G.degree[node] == 2")
+                if node in list_of_nodes:
+                    list_of_nodes.remove(node)
+    temp_dict["nodes_created"] = list_of_nodes_added_during_change
+    temp_dict["nodes_deleted"] = list_of_nodes_deleted_during_change
+    changes_dict[x+1] = temp_dict
 
-        # 
-        # limit_neighbour = list(F.neighbors(random_limit))
-        # F.remove_node(random_limit)
-        # F.add_node(random_limit)
-        # F.add_edge(random_limit, limit_neighbour[0])
-        # F.add_node(number_of_nodes+1)
-        # F.add_edge(random_limit, number_of_nodes+1)
-        # F.add_node(number_of_nodes+2)
-        # F.add_edge(random_limit, number_of_nodes+2)
+    add_limit_node_number = len(F.nodes())
+    # print("Adding LimitOFNetwork to nodes whcih dont have the correct degree for their type")
+    for node in list_of_nodes:
+        node
+        if F.nodes[node]['type'] == 'DummyNode' and F.degree[node] == 1:
+            # print("F.nodes[node]['type'] == 'DummyNode' and F.degree[node] == 1")
+            F.add_node(add_limit_node_number, type="LimitOfNetwork")
+            F.add_edge(node, add_limit_node_number)
+            add_limit_node_number += 1
+        elif F.nodes[node]['type'] == 'Switch' and F.degree[node] == 1:
+            # print("F.nodes[node]['type'] == 'Switch' and F.degree[node] == 1")
+            F.add_node(add_limit_node_number, type="LimitOfNetwork")
+            F.add_edge(node, add_limit_node_number)
+            add_limit_node_number += 1
+            F.add_node(add_limit_node_number, type="LimitOfNetwork")
+            F.add_edge(node, add_limit_node_number)
+            add_limit_node_number += 1
+        elif F.nodes[node]['type'] == 'Switch' and F.degree[node] == 2:
+            # print("F.nodes[node]['type'] == 'Switch' and F.degree[node] == 2")
+            F.add_node(add_limit_node_number, type="LimitOfNetwork")
+            F.add_edge(node, add_limit_node_number)
+            add_limit_node_number += 1
+        elif F.nodes[node]['type'] == 'FlatCrossing' and F.degree[node] == 1:
+            # print("F.nodes[node]['type'] == 'FlatCrossing' and F.degree[node] == 1")
+            F.add_node(add_limit_node_number, type="LimitOfNetwork")
+            F.add_edge(node, add_limit_node_number)
+            add_limit_node_number += 1
+            F.add_node(add_limit_node_number, type="LimitOfNetwork")
+            F.add_edge(node, add_limit_node_number)
+            add_limit_node_number += 1
+            F.add_node(add_limit_node_number, type="LimitOfNetwork")
+            F.add_edge(node, add_limit_node_number)
+            add_limit_node_number += 1
+        elif F.nodes[node]['type'] == 'FlatCrossing' and F.degree[node] == 2:
+            # print("F.nodes[node]['type'] == 'FlatCrossing' and F.degree[node] == 2")
+            F.add_node(add_limit_node_number, type="LimitOfNetwork")
+            F.add_edge(node, add_limit_node_number)
+            add_limit_node_number += 1
+            F.add_node(add_limit_node_number, type="LimitOfNetwork")
+            F.add_edge(node, add_limit_node_number)
+            add_limit_node_number += 1
+        elif F.nodes[node]['type'] == 'FlatCrossing' and F.degree[node] == 3:
+            # print("F.nodes[node]['type'] == 'FlatCrossing' and F.degree[node] == 3")
+            F.add_node(add_limit_node_number, type="LimitOfNetwork")
+            F.add_edge(node, add_limit_node_number)
+            add_limit_node_number += 1
+    
+    
+    """
+    # catch if node zero was deleted. Clear the graph and populate with one node, node zero
+    for node in F:
+        list_of_end_process = []
+        list_of_end_process.append(node)
+    if 0 not in list_of_end_process:
+        F.clear()
+        F.add_node(0, type="LimitOfNetwork")
+    
+    # catch if deleting a node caused a cluster of node tp be separated from the main group. this cluster needs deleting
+    deleted_nodes_cluster = []
+    for node in F:
+        if node not in nx.node_connected_component(F, 0):
+            deleted_nodes_cluster.append(node)
+    if not deleted_nodes_cluster:
+        F.remove_nodes_from(deleted_nodes_cluster)
 
-    # print(random_limit)
-    print("Data and graph for F")
+    """
     F.nodes(data=True)
+    """ Graph data for edited graph"""
+    """
+    print("Data and graph for F")
+    print(nx.node_connected_component(F, 0))
+    print(deleted_nodes_cluster)
+    print(nx.number_connected_components(F))
     print(nx.info(F))
     print("\n")
+    """
 
     return F
 
-#display both graphs for troubleshooting
-G1 = graph_orig(mainGraph)
-elarge1 =[(u,v) for (u,v,d) in G1.edges(data=True)]
-pos1=nx.spring_layout(G1)
-nx.draw(G1,pos1, with_labels=True, font_weight='bold')
-plt.show(block=False) 
-plt.draw()
 
-G2 = graph_edit(mainGraph, 1)
-elarge2 =[(u,v) for (u,v,d) in G2.edges(data=True)]
-pos2=nx.spring_layout(G2)
-for k,v in pos2.items():
-    # Shift the x values of every node by 3 to the right
-    v[0] = v[0] +3
-nx.draw(G2,pos2, with_labels=True, font_weight='bold')
-plt.show() # display
-plt.draw()

@@ -26,6 +26,17 @@ def writeCon(graph):
                 if value == edges_array[0] or value == tuple(reversed(edges_array[0])):
                     track_name = key
             etree.SubElement(child1_Connectivity, graph.nodes[node]['type'], id=str(node), type="Unknown", track=track_name)
+        elif graph.nodes[node]['type'] == "DummyNode":
+            instr = ""
+            outstr = ""
+            edges_array = list(graph.edges(node))
+            for key, value in track_dict.items():
+                if value == edges_array[0] or value == tuple(reversed(edges_array[0])):
+                    instr = key
+            for key, value in track_dict.items():
+                if value == edges_array[1] or value == tuple(reversed(edges_array[1])):
+                    outstr = key
+            etree.SubElement(child1_Connectivity, graph.nodes[node]['type'], id=str(node), in_=instr, out=outstr)
         elif graph.nodes[node]['type'] == "Switch":
             instr = ""
             outMain = ""
@@ -63,5 +74,8 @@ def writeCon(graph):
 
 
     et_Connectivity = etree.ElementTree(root_Connectivity)
-    et_Connectivity.write("Connectivity.xml", encoding='utf-8', xml_declaration=True, pretty_print=True)
+    if os.path.exists("Connectivity.xml"):
+        et_Connectivity.write("Connectivity-edited.xml", encoding='utf-8', xml_declaration=True, pretty_print=True)
+    else:
+        et_Connectivity.write("Connectivity.xml", encoding='utf-8', xml_declaration=True, pretty_print=True)
     return track_dict
