@@ -15,7 +15,7 @@ from graph_edit import graph_edit, changes_dict
 from editxml import replace_in
 from writeGeo import writeGeo
 from writeCon import writeCon
-from writeInfo import print_info
+from writeInfo import print_info, write_json_file, write_text_file
 
 
 
@@ -35,14 +35,14 @@ crossing_number = 0
 number_differences = 0
 
 while True:
-    # dummy_number = 3
-    # switch_number = 3
-    # crossing_number = 3
-    # number_differences = 1
-    dummy_number = input ("Choose number of dummy nodes in original graph: ")
-    switch_number = input ("Choose number of switch nodes in original graph: ")
-    crossing_number = input ("Choose number of crossing nodes in original graph: ")
-    number_differences = input ("Choose the number of differences between original graph and edited graph: ")
+    dummy_number = 30
+    switch_number = 30
+    crossing_number = 30
+    number_differences = 1
+    # dummy_number = input ("Choose number of dummy nodes in original graph: ")
+    # switch_number = input ("Choose number of switch nodes in original graph: ")
+    # crossing_number = input ("Choose number of crossing nodes in original graph: ")
+    # number_differences = input ("Choose the number of differences between original graph and edited graph: ")
     break  
 
 """
@@ -130,9 +130,10 @@ os.removedirs("Layout")
 
 shutil.move('edited_graph.orb', new_directory)
 
+# print_info(changes_dict)
+write_json_file(changes_dict, new_directory)
+write_text_file(changes_dict, new_directory)
 
-
-print_info(changes_dict)
 """ to display graphs uncomment the below code """
 """
 #display both graphs for troubleshooting
