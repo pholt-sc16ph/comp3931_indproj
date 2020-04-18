@@ -35,14 +35,14 @@ crossing_number = 0
 number_differences = 0
 
 while True:
-    dummy_number = 30
-    switch_number = 30
-    crossing_number = 30
-    number_differences = 1
-    # dummy_number = input ("Choose number of dummy nodes in original graph: ")
-    # switch_number = input ("Choose number of switch nodes in original graph: ")
-    # crossing_number = input ("Choose number of crossing nodes in original graph: ")
-    # number_differences = input ("Choose the number of differences between original graph and edited graph: ")
+    # dummy_number = 10
+    # switch_number = 10
+    # crossing_number = 10
+    # number_differences = 5
+    dummy_number = input ("Choose number of dummy nodes in original graph: ")
+    switch_number = input ("Choose number of switch nodes in original graph: ")
+    crossing_number = input ("Choose number of crossing nodes in original graph: ")
+    number_differences = input ("Choose the number of differences between original graph and edited graph: ")
     break  
 
 """

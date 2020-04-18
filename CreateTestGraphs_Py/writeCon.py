@@ -1,6 +1,7 @@
 from lxml import etree
 import random
 import os
+import time
 
 
 
@@ -34,11 +35,8 @@ def writeCon(graph):
                 if value == edges_array[0] or value == tuple(reversed(edges_array[0])):
                     instr = key
             for key, value in track_dict.items():
-                if len(edges_array) == 2:
-                    if value == edges_array[1] or value == tuple(reversed(edges_array[1])):
-                        outstr = key
-                    else:
-                        do_nothing = 0
+                if value == edges_array[1] or value == tuple(reversed(edges_array[1])):
+                    outstr = key
             etree.SubElement(child1_Connectivity, graph.nodes[node]['type'], id=str(node), in_=instr, out=outstr)
         elif graph.nodes[node]['type'] == "Switch":
             instr = ""
@@ -52,11 +50,8 @@ def writeCon(graph):
                 if value == edges_array[1] or value == tuple(reversed(edges_array[1])):
                     outMain = key
             for key, value in track_dict.items():
-                if len(edges_array) == 3:
-                    if value == edges_array[2] or value == tuple(reversed(edges_array[2])):
-                        outBranch = key
-                    else:
-                        do_nothing = 0
+                if value == edges_array[2] or value == tuple(reversed(edges_array[2])):
+                        outBranch = key         
             etree.SubElement(child1_Connectivity, graph.nodes[node]['type'], id=str(node), in_=instr, outMain=outMain, outBranch=outBranch, branchDirection="Right")
         elif graph.nodes[node]['type'] == "FlatCrossing":
             inMain = ""
@@ -74,11 +69,8 @@ def writeCon(graph):
                 if value == edges_array[2] or value == tuple(reversed(edges_array[2])):
                     inCross = key
             for key, value in track_dict.items():
-                if len(edges_array) == 4:
-                    if value == edges_array[3] or value == tuple(reversed(edges_array[3])):
-                        outCross = key
-                else:
-                    do_nothing = 0
+                if value == edges_array[3] or value == tuple(reversed(edges_array[3])):
+                    outCross = key
             etree.SubElement(child1_Connectivity, graph.nodes[node]['type'], id=str(node), inMain=inMain, outMain=outMain, inCross=inCross, outCross=outCross, direction="RightToLeft")
 
 

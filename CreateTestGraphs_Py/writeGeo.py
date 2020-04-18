@@ -1,7 +1,7 @@
 from lxml import etree
 import random
 import os
-
+import time
 
 def writeGeo(graph, num_nodes, track_dict):
     xMax = num_nodes * 5
