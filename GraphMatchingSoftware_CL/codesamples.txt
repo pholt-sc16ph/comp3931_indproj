@@ -1,0 +1,201 @@
+*****************************************************************************************************************************************
+*****************************************************************************************************************************************
+Code to create an undirected graph edited from https://www.softwaretestinghelp.com/graph-implementation-cpp/
+
+// GraphMatchingSoftware_CL.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
+
+#include <iostream>
+#include <string>
+#include "include/rapidxml.hpp"
+#include "include/rapidxml_iterators.hpp"
+#include "include/rapidxml_print.hpp"
+#include "include/rapidxml_utils.hpp"
+
+using namespace std;
+
+
+// stores adjacency list items
+struct adjNode {
+    int val;
+    adjNode* next;
+};
+// structure to store edges
+struct graphEdge {
+    int start_ver, end_ver;
+};
+class DiaGraph {
+    // insert new nodes into adjacency list from given graph
+    adjNode* getAdjListNode(int value, adjNode* head) {
+        adjNode* newNode = new adjNode;
+        newNode->val = value;
+
+        newNode->next = head;   // point new node to current head
+        return newNode;
+    }
+    int N;  // number of nodes in the graph
+public:
+    adjNode** head;   //adjacency list as array of pointers
+    // Constructor
+    DiaGraph(graphEdge edges[], int n, int N) {
+        // allocate new node
+        head = new adjNode * [N]();
+        this->N = N;
+        // initialize head pointer for all vertices
+        for (int i = 0; i < N; ++i)
+            head[i] = nullptr;
+        // construct directed graph by adding edges to it
+        for (unsigned i = 0; i < n; i++) {
+            int start_ver = edges[i].start_ver;
+            int end_ver = edges[i].end_ver;
+            // insert in the beginning
+            adjNode* newNode = getAdjListNode(end_ver, head[start_ver]);
+
+            // point head pointer to new node
+            head[start_ver] = newNode;
+        }
+    }
+    // Destructor
+    ~DiaGraph() {
+        for (int i = 0; i < N; i++)
+            delete[] head[i];
+        delete[] head;
+    }
+};
+// print all adjacent vertices of given vertex
+void display_AdjList(adjNode* ptr, int i)
+{
+    while (ptr != nullptr) {
+        cout << "(" << i << ", " << ptr->val << ")";
+        ptr = ptr->next;
+    }
+    cout << endl;
+}
+
+int main()
+{
+    //Creating Graphs
+    // graph edges array.
+    graphEdge edges[] = {
+        // (x, y) -> edge from x to y
+        {0,1},{1,2},{2,6},{2,3},{4,3},{5,3},{3,7}
+    };
+    int N = 6;      // Number of vertices in the graph
+    // calculate number of edges
+    int n = sizeof(edges) / sizeof(edges[0]);
+    // construct graph
+    DiaGraph diagraph(edges, n, N);
+    // print adjacency list representation of graph
+    cout << "Graph adjacency list " << endl << "(start_vertex, end_vertex):" << endl;
+    for (int i = 0; i < N; i++)
+    {
+        // display adjacent vertices of vertex i
+        display_AdjList(diagraph.head[i], i);
+    }
+    return 0;
+}
+
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
+// Tips for Getting Started: 
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+
+
+
+*****************************************************************************************************************************************
+*****************************************************************************************************************************************
+
+
+// GraphMatchingSoftware_CL.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
+
+#include <iostream>
+#include <deque>
+#include <iterator>
+#include "include/rapidxml/rapidxml.hpp"
+#include "include/rapidxml/rapidxml_iterators.hpp"
+#include "include/rapidxml/rapidxml_print.hpp"
+#include "include/rapidxml/rapidxml_utils.hpp"
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/topological_sort.hpp>
+#include <boost/graph/graphviz.hpp>
+#include <boost/graph/isomorphism.hpp>
+
+int main()
+{
+    using namespace std;
+    using namespace boost;
+
+    /* define the graph type
+          listS: selects the STL list container to store
+                 the OutEdge list
+          vecS: selects the STL vector container to store
+                the vertices
+          directedS: selects directed edges
+    */
+    typedef adjacency_list< listS, vecS, undirectedS> undigraph;
+
+    // instantiate a digraph object with 8 vertices
+    undigraph g(8);
+    undigraph ga(8);
+    undigraph f(8);
+    // add some edges
+    add_edge(0, 1, g);
+    add_edge(1, 5, g);
+    add_edge(5, 6, g);
+    add_edge(2, 3, g);
+    add_edge(2, 4, g);
+    add_edge(3, 5, g);
+    add_edge(4, 5, g);
+    add_edge(5, 7, g);
+    // add some edges
+    add_edge(0, 1, ga);
+    add_edge(1, 5, ga);
+    add_edge(5, 6, ga);
+    add_edge(2, 3, ga);
+    add_edge(2, 4, ga);
+    add_edge(3, 5, ga);
+    add_edge(4, 5, ga);
+    add_edge(5, 7, ga);
+    // add some edges
+    add_edge(0, 1, f);
+    add_edge(1, 5, f);
+    add_edge(5, 6, f);
+    add_edge(2, 3, f);
+    add_edge(2, 4, f);
+    add_edge(3, 5, f);
+    add_edge(4, 5, f);
+    add_edge(5, 7, f);
+    add_edge(5, 0, f);
+
+
+    std::ofstream ofsg("g.dot");
+    write_graphviz(ofsg, g);
+    std::ofstream ofsga("ga.dot");
+    write_graphviz(ofsga, ga);
+    std::ofstream ofsf("f.dot");
+    write_graphviz(ofsf, f);
+    return 0;
+}
+//std::ofstream ofs("test.dot");
+//write_graphviz(ofs, g);
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
+// Tips for Getting Started: 
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+
+
+*****************************************************************************************************************************************
+*****************************************************************************************************************************************

@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Layout version="1.0" xMin="0" yMin="0" xMax="20" yMax="20" xmlns="https://www.tracsis.com/infrastructure">
+  <NodePositions>
+    <NodePosition id="0" x="19" y="1"/>
+    <NodePosition id="1" x="17" y="2"/>
+    <NodePosition id="2" x="4" y="3"/>
+    <NodePosition id="3" x="18" y="16"/>
+  </NodePositions>
+  <TrackSectionPositions>
+    <TrackSectionPosition id="tr_1">
+      <Point x="19" y="1"/>
+      <Point x="17" y="2"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_2">
+      <Point x="17" y="2"/>
+      <Point x="4" y="3"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_3">
+      <Point x="17" y="2"/>
+      <Point x="18" y="16"/>
+    </TrackSectionPosition>
+  </TrackSectionPositions>
+  <LocationLabels/>
+</Layout>
