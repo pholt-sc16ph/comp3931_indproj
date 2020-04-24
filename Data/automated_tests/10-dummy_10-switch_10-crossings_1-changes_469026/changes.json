@@ -1,0 +1,24 @@
+{
+    "1": {
+        "action_completed": "deletenode",
+        "node_acted_upon": [
+            16,
+            "DummyNode"
+        ],
+        "node_swapped_or_added": [
+            16,
+            "This node was deleted"
+        ],
+        "nodes_created": [
+            [
+                35,
+                "LimitOfNetwork"
+            ],
+            [
+                36,
+                "LimitOfNetwork"
+            ]
+        ],
+        "nodes_deleted": []
+    }
+}

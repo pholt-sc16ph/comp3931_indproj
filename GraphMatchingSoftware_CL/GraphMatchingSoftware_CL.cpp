@@ -6,12 +6,15 @@
 #include <string>
 #include <set>
 #include <exception>
+#include <fstream>
+#include <stdlib.h>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graphviz.hpp>
 #include <boost/graph/isomorphism.hpp>
 #include <boost/graph/vf2_sub_graph_iso.hpp>
 #include <boost/graph/graph_utility.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/filesystem/directory.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -25,7 +28,7 @@
 using namespace std;
 using namespace boost;
 namespace pt = boost::property_tree;
-
+typedef std::vector<std::string> stringvec;
 
 using Graph = adjacency_list<vecS, vecS, undirectedS,
     property<vertex_name_t, string> >;
@@ -95,7 +98,7 @@ vector<string> createNodes(string path_to_file) {
     vector<string> nodes;
     boost::property_tree::ptree conn;
     boost::property_tree::read_xml(path_to_file, conn);
-    //std::cout << "\n" + constants::ORIGINAL_FOLDER_WITH_CON_XML << "\n";
+    //std::cout << "\nNodes:\n";
     try
     {
         BOOST_FOREACH(boost::property_tree::ptree::value_type const& node, conn.get_child("Connectivity.Nodes"))
@@ -120,9 +123,10 @@ vector<string> createNodes(string path_to_file) {
 
 vector<boost::tuple<int, int>> createEdges(string path_to_file) {
     vector<boost::tuple<int, int>> edges;
+    edges.reserve(50000);
     boost::property_tree::ptree conn;
     boost::property_tree::read_xml(path_to_file, conn);
-    //std::cout << "\n" + constants::ORIGINAL_FOLDER_WITH_CON_XML << "\n";
+    //std::cout << "\nEdges:\n";
     try
     {
         BOOST_FOREACH(boost::property_tree::ptree::value_type const& node, conn.get_child("Connectivity.TrackSections"))
@@ -143,6 +147,7 @@ vector<boost::tuple<int, int>> createEdges(string path_to_file) {
             }
             std::cout << std::endl;
         }
+        std::cout << "\n";
     }
     catch (std::exception& e)
     {
@@ -150,26 +155,137 @@ vector<boost::tuple<int, int>> createEdges(string path_to_file) {
     }
     return edges;
 }
+struct path_leaf_string
+{
+    std::string operator()(const boost::filesystem::directory_entry& entry) const
+    {
+        return entry.path().leaf().string();
+    }
+};
+void read_directory(const std::string& name, stringvec& v)
+{
+    boost::filesystem::path p(name);
+    boost::filesystem::directory_iterator start(p);
+    boost::filesystem::directory_iterator end;
+    std::transform(start, end, std::back_inserter(v), path_leaf_string());
+}
+
+
 
 int main() {
-    
-    boost::filesystem::path dir(constants::GMS_CL_FOLDER_IN_TESTS);
-    if (boost::filesystem::create_directory(dir))
-    {
-        std::cerr << "Directory Created: " << std::endl;
+    stringvec v;
+    read_directory("../Data/automated_tests/", v);
+    int x = 0;
+    for (auto it = std::begin(v); it != std::end(v); ++it) {
+        std::cout << "Index: " + std::to_string(x)+ " || Test Name: " + *it << "\n";
+        x++;
+    }
+    if (v.empty()) {
+        std::cout << "No vector of tests. Please create a test from /CreateTestGraphs_Py directory by running 'python create.py' and try again\nClosing program...";
+        return 0;
     }
 
-    boost::filesystem::copy_file(constants::PATH_SOURCE_FILE_ORIGINAL, constants::PATH_DEST_FILE_ORIGINAL, boost::filesystem::copy_option::overwrite_if_exists);
-    boost::filesystem::copy_file(constants::PATH_SOURCE_FILE_EDITED, constants::PATH_DEST_FILE_EDITED, boost::filesystem::copy_option::overwrite_if_exists);
+    int num;
+    std::string test_selected;
+    std::cout << "Please enter the index number of the test you would like to select: ";
+    cin >> num;
     
-    vector<string> nodesOriginal = createNodes(constants::PATH_TO_ORIGINAL_CON_XML);
-    vector<boost::tuple<int,int>> edgesOriginal = createEdges(constants::PATH_TO_ORIGINAL_CON_XML);
+    if (num > x) {
+        std::cout << "Index selected doesn't exist. Please run the program again and select a valid test";
+        return 0;
+    }
+    else if (cin.fail()) {
+        std::cout << "Please enter an integer value from the index list";
+        return 0;
+    }
+    else {
+        std::string test_selected = v.at(num);
+
+        
+        //create the GMS_CL folder in the specifed automated_tests folder. As it stands the specific test is hardcoded in constants.h
+        boost::filesystem::path dir(constants::PATH_TO_TESTS + test_selected + constants::GMS_CL_FOLDER);
+        boost::filesystem::create_directory(dir);
+        stringvec GMS_dir;
+        read_directory("../Data/automated_tests/" + test_selected + constants::GMS_CL_FOLDER, GMS_dir);
+        if (GMS_dir.empty()) {
+            //copy the .orb files from the test folder into the newly created GMS_CL folder for manipulation
+            boost::filesystem::copy_file(constants::PATH_TO_TESTS + test_selected + constants::ORIGINAL_GRAPH_FILENAME, constants::PATH_TO_TESTS + test_selected + constants::GMS_CL_FOLDER + constants::ORIGINAL_GRAPH_FILENAME_ZIP, boost::filesystem::copy_option::overwrite_if_exists);
+            boost::filesystem::copy_file(constants::PATH_TO_TESTS + test_selected + constants::EDITED_GRAPH_FILENAME, constants::PATH_TO_TESTS + test_selected + constants::GMS_CL_FOLDER + constants::EDITED_GRAPH_FILENAME_ZIP, boost::filesystem::copy_option::overwrite_if_exists);
+
+            //extract heirachy structure from .zip file and place in GMS_CL folder. Using scripts and batch file to complete this to save time.
+
+            ofstream batch;
+            batch.open("extract.bat", ios::out);
+            batch << "Powershell Expand-Archive -Path '../Data/automated_tests/" + test_selected + "/GraphMatchingSoftware_CL/original_graph.zip' -DestinationPath ../Data/automated_tests/" + test_selected + "/GraphMatchingSoftware_CL/original_graph\n";
+            batch << "Powershell Expand-Archive -Path '../Data/automated_tests/" + test_selected + "/GraphMatchingSoftware_CL/edited_graph.zip' -DestinationPath ../Data/automated_tests/" + test_selected + "/GraphMatchingSoftware_CL/edited_graph\n";
+            batch.close();
+            std::system("extract.bat");
+            std::remove("extract.bat");
+        }
+
+
+        //create vector to hold the nodes derived from test Connectivity.xml file from original
+        vector<string> nodesOriginal = createNodes(constants::PATH_TO_TESTS + test_selected + constants::PATH_TO_ORIGINAL_CON_XML);
+        //create vector to hold edges derived from test Connectivity.xml file from original
+        vector<boost::tuple<int, int>> edgesOriginal = createEdges(constants::PATH_TO_TESTS + test_selected + constants::PATH_TO_ORIGINAL_CON_XML);
+        //create graph for use with isomorphism function and to create .dot file to view graph in gvedit
+        const auto original = create_graph(nodesOriginal, edgesOriginal);
+        ofstream ofso("original.dot");
+        write_graphviz(ofso, original);
+
+        //create vector to hold the nodes derived from test Connectivity.xml file from edited
+        vector<string> nodesEdited = createNodes(constants::PATH_TO_TESTS + test_selected + constants::PATH_TO_EDITED_CON_XML);
+        //create vector to hold edges derived from test Connectivity.xml file from edited
+        vector<boost::tuple<int, int>> edgesEdited = createEdges(constants::PATH_TO_TESTS + test_selected + constants::PATH_TO_EDITED_CON_XML);
+        //create graph for use with isomorphism function and to create .dot file to view graph in gvedit
+        const auto edited = create_graph(nodesEdited, edgesEdited);
+        ofstream ofse("edited.dot");
+        write_graphviz(ofse, edited);
+
+        if (boost::isomorphism(original, edited)) {
+            std::cout << "\nGraphs are isomorphic returning from program. Either data set is valid as there are no differences between them\n";
+            return 0;
+        }
+        else {
+            std::cout << "\nGraphs are different. Performing check to create super graph\n";
+            return 0;
+        }
+    };
+
+
+    //create the GMS_CL folder in the specifed automated_tests folder. As it stands the specific test is hardcoded in constants.h
+    boost::filesystem::path dir(constants::PATH_TO_TESTS + test_selected + constants::GMS_CL_FOLDER);
+    boost::filesystem::create_directory(dir);
+    
+    //copy the .orb files from the test folder into the newly created GMS_CL folder for manipulation
+    boost::filesystem::copy_file(constants::PATH_TO_TESTS+test_selected+constants::ORIGINAL_GRAPH_FILENAME, constants::PATH_TO_TESTS+test_selected+constants::GMS_CL_FOLDER+constants::ORIGINAL_GRAPH_FILENAME_ZIP, boost::filesystem::copy_option::overwrite_if_exists);
+    boost::filesystem::copy_file(constants::PATH_TO_TESTS+test_selected+constants::EDITED_GRAPH_FILENAME, constants::PATH_TO_TESTS+test_selected+constants::GMS_CL_FOLDER+constants::EDITED_GRAPH_FILENAME_ZIP, boost::filesystem::copy_option::overwrite_if_exists);
+
+    //extract heirachy structure from .zip file and place in GMS_CL folder. Using scripts and batch file to complete this to save time.
+
+    ofstream batch;
+    batch.open("extract.bat", ios::out);
+    batch << "Powershell Expand-Archive -Path '../Data/automated_tests/" + test_selected +"/GraphMatchingSoftware_CL/original_graph.zip' -DestinationPath ../Data/automated_tests/" + test_selected + "/GraphMatchingSoftware_CL/original_graph\n";
+    batch << "Powershell Expand-Archive -Path '../Data/automated_tests/" + test_selected + "/GraphMatchingSoftware_CL/edited_graph.zip' -DestinationPath ../Data/automated_tests/" + test_selected + "/GraphMatchingSoftware_CL/edited_graph\n";
+    batch.close();
+    std::system("extract.bat");
+    std::remove("extract.bat");
+
+
+    //create vector to hold the nodes derived from test Connectivity.xml file from original
+    vector<string> nodesOriginal = createNodes(constants::PATH_TO_TESTS + test_selected + constants::PATH_TO_ORIGINAL_CON_XML);
+    //create vector to hold edges derived from test Connectivity.xml file from original
+    vector<boost::tuple<int,int>> edgesOriginal = createEdges(constants::PATH_TO_TESTS + test_selected + constants::PATH_TO_ORIGINAL_CON_XML);
+    //create graph for use with isomorphism function and to create .dot file to view graph in gvedit
     const auto original = create_graph(nodesOriginal, edgesOriginal);
     ofstream ofso("original.dot");
     write_graphviz(ofso, original);
 
-    vector<string> nodesEdited = createNodes(constants::PATH_TO_EDITED_CON_XML);
-    vector<boost::tuple<int, int>> edgesEdited = createEdges(constants::PATH_TO_EDITED_CON_XML);
+    //create vector to hold the nodes derived from test Connectivity.xml file from edited
+    vector<string> nodesEdited = createNodes(constants::PATH_TO_TESTS + test_selected + constants::PATH_TO_EDITED_CON_XML);
+    //create vector to hold edges derived from test Connectivity.xml file from edited
+    vector<boost::tuple<int, int>> edgesEdited = createEdges(constants::PATH_TO_TESTS + test_selected + constants::PATH_TO_EDITED_CON_XML);
+    //create graph for use with isomorphism function and to create .dot file to view graph in gvedit
     const auto edited = create_graph(nodesEdited, edgesEdited);
     ofstream ofse("edited.dot");
     write_graphviz(ofse, edited);
@@ -179,7 +295,7 @@ int main() {
         return 0;
     }
     else {
-        std::cout << "\nGraphs are different performing check to create super graph\n";
+        std::cout << "\nGraphs are different. Performing check to create super graph\n";
         return 0;
     }
 

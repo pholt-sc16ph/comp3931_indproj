@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Connectivity version="1.0" xmlns="https://www.tracsis.com/infrastructure">
+  <Nodes>
+    <LimitOfNetwork id="0" type="Unknown" track="tr_1"/>
+    <DummyNode id="1" in="tr_1" out="tr_2"/>
+    <FlatCrossing id="2" inMain="tr_2" outMain="tr_3" inCross="tr_4" outCross="tr_5" direction="RightToLeft"/>
+    <FlatCrossing id="3" inMain="tr_3" outMain="tr_6" inCross="tr_7" outCross="tr_8" direction="RightToLeft"/>
+    <FlatCrossing id="4" inMain="tr_4" outMain="tr_9" inCross="tr_10" outCross="tr_11" direction="RightToLeft"/>
+    <FlatCrossing id="5" inMain="tr_9" outMain="tr_5" inCross="tr_12" outCross="tr_13" direction="RightToLeft"/>
+    <Switch id="6" in="tr_10" outMain="tr_12" outBranch="tr_14" branchDirection="Right"/>
+    <Switch id="7" in="tr_11" outMain="tr_6" outBranch="tr_15" branchDirection="Right"/>
+    <FlatCrossing id="8" inMain="tr_15" outMain="tr_13" inCross="tr_16" outCross="tr_17" direction="RightToLeft"/>
+    <Switch id="9" in="tr_7" outMain="tr_18" outBranch="tr_19" branchDirection="Right"/>
+    <FlatCrossing id="10" inMain="tr_18" outMain="tr_8" inCross="tr_20" outCross="tr_21" direction="RightToLeft"/>
+    <Switch id="11" in="tr_16" outMain="tr_20" outBranch="tr_22" branchDirection="Right"/>
+    <FlatCrossing id="12" inMain="tr_21" outMain="tr_17" inCross="tr_14" outCross="tr_23" direction="RightToLeft"/>
+    <Switch id="13" in="tr_19" outMain="tr_23" outBranch="tr_24" branchDirection="Right"/>
+    <Switch id="14" in="tr_22" outMain="tr_25" outBranch="tr_26" branchDirection="Right"/>
+    <FlatCrossing id="15" inMain="tr_24" outMain="tr_25" inCross="tr_27" outCross="tr_28" direction="RightToLeft"/>
+    <DummyNode id="16" in="tr_27" out="tr_29"/>
+    <DummyNode id="17" in="tr_26" out="tr_30"/>
+    <FlatCrossing id="18" inMain="tr_29" outMain="tr_28" inCross="tr_31" outCross="tr_32" direction="RightToLeft"/>
+    <FlatCrossing id="19" inMain="tr_31" outMain="tr_30" inCross="tr_33" outCross="tr_34" direction="RightToLeft"/>
+    <DummyNode id="20" in="tr_32" out="tr_35"/>
+    <DummyNode id="21" in="tr_33" out="tr_36"/>
+    <DummyNode id="22" in="tr_36" out="tr_37"/>
+    <DummyNode id="23" in="tr_34" out="tr_38"/>
+    <Switch id="24" in="tr_38" outMain="tr_37" outBranch="tr_39" branchDirection="Right"/>
+    <DummyNode id="25" in="tr_35" out="tr_40"/>
+    <Switch id="26" in="tr_39" outMain="tr_41" outBranch="tr_42" branchDirection="Right"/>
+    <DummyNode id="27" in="tr_40" out="tr_43"/>
+    <Switch id="28" in="tr_41" outMain="tr_44" outBranch="tr_45" branchDirection="Right"/>
+    <Switch id="29" in="tr_42" outMain="tr_46" outBranch="tr_47" branchDirection="Right"/>
+    <DummyNode id="30" in="tr_46" out="tr_48"/>
+    <LimitOfNetwork id="31" type="Unknown" track="tr_43"/>
+    <LimitOfNetwork id="32" type="Unknown" track="tr_44"/>
+    <LimitOfNetwork id="33" type="Unknown" track="tr_45"/>
+    <LimitOfNetwork id="34" type="Unknown" track="tr_47"/>
+    <LimitOfNetwork id="35" type="Unknown" track="tr_48"/>
+  </Nodes>
+  <TrackSections>
+    <TrackSection id="tr_1" length="100" startNode="0" endNode="1"/>
+    <TrackSection id="tr_2" length="100" startNode="1" endNode="2"/>
+    <TrackSection id="tr_3" length="100" startNode="2" endNode="3"/>
+    <TrackSection id="tr_4" length="100" startNode="2" endNode="4"/>
+    <TrackSection id="tr_5" length="100" startNode="2" endNode="5"/>
+    <TrackSection id="tr_6" length="100" startNode="3" endNode="7"/>
+    <TrackSection id="tr_7" length="100" startNode="3" endNode="9"/>
+    <TrackSection id="tr_8" length="100" startNode="3" endNode="10"/>
+    <TrackSection id="tr_9" length="100" startNode="4" endNode="5"/>
+    <TrackSection id="tr_10" length="100" startNode="4" endNode="6"/>
+    <TrackSection id="tr_11" length="100" startNode="4" endNode="7"/>
+    <TrackSection id="tr_12" length="100" startNode="5" endNode="6"/>
+    <TrackSection id="tr_13" length="100" startNode="5" endNode="8"/>
+    <TrackSection id="tr_14" length="100" startNode="6" endNode="12"/>
+    <TrackSection id="tr_15" length="100" startNode="7" endNode="8"/>
+    <TrackSection id="tr_16" length="100" startNode="8" endNode="11"/>
+    <TrackSection id="tr_17" length="100" startNode="8" endNode="12"/>
+    <TrackSection id="tr_18" length="100" startNode="9" endNode="10"/>
+    <TrackSection id="tr_19" length="100" startNode="9" endNode="13"/>
+    <TrackSection id="tr_20" length="100" startNode="10" endNode="11"/>
+    <TrackSection id="tr_21" length="100" startNode="10" endNode="12"/>
+    <TrackSection id="tr_22" length="100" startNode="11" endNode="14"/>
+    <TrackSection id="tr_23" length="100" startNode="12" endNode="13"/>
+    <TrackSection id="tr_24" length="100" startNode="13" endNode="15"/>
+    <TrackSection id="tr_25" length="100" startNode="14" endNode="15"/>
+    <TrackSection id="tr_26" length="100" startNode="14" endNode="17"/>
+    <TrackSection id="tr_27" length="100" startNode="15" endNode="16"/>
+    <TrackSection id="tr_28" length="100" startNode="15" endNode="18"/>
+    <TrackSection id="tr_29" length="100" startNode="16" endNode="18"/>
+    <TrackSection id="tr_30" length="100" startNode="17" endNode="19"/>
+    <TrackSection id="tr_31" length="100" startNode="18" endNode="19"/>
+    <TrackSection id="tr_32" length="100" startNode="18" endNode="20"/>
+    <TrackSection id="tr_33" length="100" startNode="19" endNode="21"/>
+    <TrackSection id="tr_34" length="100" startNode="19" endNode="23"/>
+    <TrackSection id="tr_35" length="100" startNode="20" endNode="25"/>
+    <TrackSection id="tr_36" length="100" startNode="21" endNode="22"/>
+    <TrackSection id="tr_37" length="100" startNode="22" endNode="24"/>
+    <TrackSection id="tr_38" length="100" startNode="23" endNode="24"/>
+    <TrackSection id="tr_39" length="100" startNode="24" endNode="26"/>
+    <TrackSection id="tr_40" length="100" startNode="25" endNode="27"/>
+    <TrackSection id="tr_41" length="100" startNode="26" endNode="28"/>
+    <TrackSection id="tr_42" length="100" startNode="26" endNode="29"/>
+    <TrackSection id="tr_43" length="100" startNode="27" endNode="31"/>
+    <TrackSection id="tr_44" length="100" startNode="28" endNode="32"/>
+    <TrackSection id="tr_45" length="100" startNode="28" endNode="33"/>
+    <TrackSection id="tr_46" length="100" startNode="29" endNode="30"/>
+    <TrackSection id="tr_47" length="100" startNode="29" endNode="34"/>
+    <TrackSection id="tr_48" length="100" startNode="30" endNode="35"/>
+  </TrackSections>
+</Connectivity>

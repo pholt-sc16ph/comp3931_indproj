@@ -1,0 +1,20 @@
+{
+    "1": {
+        "action_completed": "swapwithdummynode",
+        "node_acted_upon": [
+            0,
+            "LimitOfNetwork"
+        ],
+        "node_swapped_or_added": [
+            0,
+            "DummyNode"
+        ],
+        "nodes_created": [
+            [
+                4,
+                "LimitOfNetwork"
+            ]
+        ],
+        "nodes_deleted": []
+    }
+}
