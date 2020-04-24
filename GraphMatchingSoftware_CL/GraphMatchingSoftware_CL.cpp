@@ -6,10 +6,6 @@
 #include <string>
 #include <set>
 #include <exception>
-#include "include/rapidxml/rapidxml.hpp"
-#include "include/rapidxml/rapidxml_iterators.hpp"
-#include "include/rapidxml/rapidxml_print.hpp"
-#include "include/rapidxml/rapidxml_utils.hpp"
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graphviz.hpp>
 #include <boost/graph/isomorphism.hpp>
@@ -24,6 +20,7 @@
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast/lexical_cast_old.hpp>
 
+#include "constants.h"
 
 using namespace std;
 using namespace boost;
@@ -69,7 +66,6 @@ Graph create_graph(const vector<string>& names, const vector<boost::tuple<int, i
 
 //////////////////////////////////////// {{{
 namespace {
-
     struct VertexInvariant {
         using Map = map<string, size_t>;
         Graph const& _graph;
@@ -93,142 +89,43 @@ namespace {
             }
         }
     };
-
-
 }
 //////////////////////////////////////// }}}
-
-
-int main() { 
-
-    
-    string path_to_tests = "../Data/automated_tests/";
-    string test_in_directory = "0-dummy_1-switch_0-crossings_1-changes_116088/";
-    string folder_in_tests = path_to_tests + test_in_directory;
-
-    string GMS_CL_folder = "GraphMatchingSoftware_CL/";
-    string original_folder = "original_graph/";
-    string edited_folder = "edited_graph/";
-    string original_graph_filename = "original_graph.orb";
-    string edited_graph_filename = "edited_graph.orb";
-    string original_graph_filename_zip = "original_graph.zip";
-    string edited_graph_filename_zip = "edited_graph.zip";
-    
-    string con_xml = "Connectivity.xml";
-    string path_to_orig_con_xml = folder_in_tests + GMS_CL_folder + original_folder + con_xml;
-    string path_to_edit_con_xml = folder_in_tests + GMS_CL_folder + edited_folder + con_xml;
-    boost::filesystem::path dir(folder_in_tests+GMS_CL_folder);
-    if (boost::filesystem::create_directory(dir))
-    {
-        std::cerr << "Directory Created: " << std::endl;
-    }
-
-    boost::filesystem::path source_file_original = (folder_in_tests + original_graph_filename);
-    boost::filesystem::path dest_file_original = (folder_in_tests + GMS_CL_folder + original_graph_filename_zip);
-    boost::filesystem::copy_file(source_file_original, dest_file_original, boost::filesystem::copy_option::overwrite_if_exists);
-
-    boost::filesystem::path source_file_edited = (folder_in_tests + edited_graph_filename);
-    boost::filesystem::path dest_file_edited = (folder_in_tests + GMS_CL_folder + edited_graph_filename_zip);
-    boost::filesystem::copy_file(source_file_edited, dest_file_edited, boost::filesystem::copy_option::overwrite_if_exists);
-
-    const std::string XML_PATH1 = "./test.xml";
-    const std::string DEFAULT_PART_NO = "XYZ";
-    const std::string DEFAULT_ZIP = "90125";
-    boost::property_tree::ptree pt1;
-    boost::property_tree::read_xml(XML_PATH1, pt1);
+vector<string> createNodes(string path_to_file) {
+    vector<string> nodes;
+    boost::property_tree::ptree conn;
+    boost::property_tree::read_xml(path_to_file, conn);
+    //std::cout << "\n" + constants::ORIGINAL_FOLDER_WITH_CON_XML << "\n";
     try
     {
-        // Traverse property tree example
-        BOOST_FOREACH(boost::property_tree::ptree::value_type const& node, pt1.get_child("purchaseOrder.items"))
-        {
-            boost::property_tree::ptree subtree = node.second;
-
-            if (node.first == "item")
-            {
-                BOOST_FOREACH(boost::property_tree::ptree::value_type const& v, subtree.get_child(""))
-                {
-                    std::string label = v.first;
-
-                    if (label != "<xmlattr>")
-                    {
-                        std::string value = subtree.get<std::string>(label);
-                        //std::cout << label << ":  " << value << std::endl;
-                    }
-                }
-                //std::cout << std::endl;
-            }
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << "Error: " << e.what() << "\n";
-    }
-
-    const std::string XML_PATH_ORIG = path_to_orig_con_xml;
-    vector<string> nodes_original;
-    vector<boost::tuple<int, int>> edges_original;
-    boost::property_tree::ptree or_conn;
-    boost::property_tree::read_xml(XML_PATH_ORIG, or_conn);
-    std::cout << "\n" + original_folder + con_xml << "\n";
-    try 
-    {
-        BOOST_FOREACH(boost::property_tree::ptree::value_type const& node, or_conn.get_child("Connectivity.Nodes"))
-        {
-            boost::property_tree::ptree subtree = node.second;
-            std::string node_label = node.second.get_child("<xmlattr>.id").data();
-            BOOST_FOREACH(boost::property_tree::ptree::value_type const& v, subtree.get_child(""))
-            {
-                std::cout <<"Nodes: " << node_label;
-                nodes_original.push_back(node_label);
-            }
-            std::cout << std::endl;
-        }
-        std::cout << "\n";
-        BOOST_FOREACH(boost::property_tree::ptree::value_type const& node, or_conn.get_child("Connectivity.TrackSections"))
-        {
-            boost::property_tree::ptree subtree = node.second;
-            std::string start_node = node.second.get_child("<xmlattr>.startNode").data();
-            std::string end_node = node.second.get_child("<xmlattr>.endNode").data();
-            BOOST_FOREACH(boost::property_tree::ptree::value_type const& v, subtree.get_child(""))
-            {
-                std::cout <<"Edges: " << start_node << " -> " << end_node;
-                stringstream temp_start(start_node);
-                int start_node_int = 0;
-                temp_start >> start_node_int;
-                stringstream temp_end(end_node);
-                int end_node_int = 0;
-                temp_end >> end_node_int;
-                edges_original.push_back(boost::tuple<int, int>(start_node_int, end_node_int));
-            }
-            std::cout << std::endl;
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << "Error: " << e.what() << "\n";
-    }
-
-    const std::string XML_PATH_EDIT = path_to_edit_con_xml;
-    vector<string> nodes_edited;
-    vector<boost::tuple<int, int>> edges_edited;
-    boost::property_tree::ptree ed_conn;
-    boost::property_tree::read_xml(XML_PATH_EDIT, ed_conn);
-    std::cout << "\n" + edited_folder + con_xml << "\n";
-    try
-    {
-        BOOST_FOREACH(boost::property_tree::ptree::value_type const& node, ed_conn.get_child("Connectivity.Nodes"))
+        BOOST_FOREACH(boost::property_tree::ptree::value_type const& node, conn.get_child("Connectivity.Nodes"))
         {
             boost::property_tree::ptree subtree = node.second;
             std::string node_label = node.second.get_child("<xmlattr>.id").data();
             BOOST_FOREACH(boost::property_tree::ptree::value_type const& v, subtree.get_child(""))
             {
                 std::cout << "Nodes: " << node_label;
-                nodes_edited.push_back(node_label);
+                nodes.push_back(node_label);
             }
             std::cout << std::endl;
         }
         std::cout << "\n";
-        BOOST_FOREACH(boost::property_tree::ptree::value_type const& node, ed_conn.get_child("Connectivity.TrackSections"))
+    }
+    catch (std::exception& e)
+    {
+        std::cout << "Error: " << e.what() << "\n";
+    }
+    return nodes;
+}
+
+vector<boost::tuple<int, int>> createEdges(string path_to_file) {
+    vector<boost::tuple<int, int>> edges;
+    boost::property_tree::ptree conn;
+    boost::property_tree::read_xml(path_to_file, conn);
+    //std::cout << "\n" + constants::ORIGINAL_FOLDER_WITH_CON_XML << "\n";
+    try
+    {
+        BOOST_FOREACH(boost::property_tree::ptree::value_type const& node, conn.get_child("Connectivity.TrackSections"))
         {
             boost::property_tree::ptree subtree = node.second;
             std::string start_node = node.second.get_child("<xmlattr>.startNode").data();
@@ -242,7 +139,7 @@ int main() {
                 stringstream temp_end(end_node);
                 int end_node_int = 0;
                 temp_end >> end_node_int;
-                edges_edited.push_back(boost::tuple<int, int>(start_node_int, end_node_int));
+                edges.push_back(boost::tuple<int, int>(start_node_int, end_node_int));
             }
             std::cout << std::endl;
         }
@@ -250,19 +147,30 @@ int main() {
     catch (std::exception& e)
     {
         std::cout << "Error: " << e.what() << "\n";
-    }  
+    }
+    return edges;
+}
 
-    /*const auto original = create_graph(nodes_original, edges_original);
-    const auto edited = create_graph(nodes_original, edges_original);
-    ofstream ofso("original.dot");
-    write_graphviz(ofso, original);
-    ofstream ofse("edited.dot");
-    write_graphviz(ofse, edited);*/
+int main() {
     
-    const auto original = create_graph(nodes_original, edges_original);
-    const auto edited = create_graph(nodes_edited, edges_edited);
+    boost::filesystem::path dir(constants::GMS_CL_FOLDER_IN_TESTS);
+    if (boost::filesystem::create_directory(dir))
+    {
+        std::cerr << "Directory Created: " << std::endl;
+    }
+
+    boost::filesystem::copy_file(constants::PATH_SOURCE_FILE_ORIGINAL, constants::PATH_DEST_FILE_ORIGINAL, boost::filesystem::copy_option::overwrite_if_exists);
+    boost::filesystem::copy_file(constants::PATH_SOURCE_FILE_EDITED, constants::PATH_DEST_FILE_EDITED, boost::filesystem::copy_option::overwrite_if_exists);
+    
+    vector<string> nodesOriginal = createNodes(constants::PATH_TO_ORIGINAL_CON_XML);
+    vector<boost::tuple<int,int>> edgesOriginal = createEdges(constants::PATH_TO_ORIGINAL_CON_XML);
+    const auto original = create_graph(nodesOriginal, edgesOriginal);
     ofstream ofso("original.dot");
     write_graphviz(ofso, original);
+
+    vector<string> nodesEdited = createNodes(constants::PATH_TO_EDITED_CON_XML);
+    vector<boost::tuple<int, int>> edgesEdited = createEdges(constants::PATH_TO_EDITED_CON_XML);
+    const auto edited = create_graph(nodesEdited, edgesEdited);
     ofstream ofse("edited.dot");
     write_graphviz(ofse, edited);
 

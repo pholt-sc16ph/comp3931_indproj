@@ -3,6 +3,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+#comp3931_indproj specific files and folders to ignore 
+GraphMatchingSoftware_CL/edited.dot
+GraphMatchingSoftware_CL/original.dot
+
 # User-specific files
 *.rsuser
 *.suo
