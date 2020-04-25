@@ -6,6 +6,13 @@
 #comp3931_indproj specific files and folders to ignore 
 GraphMatchingSoftware_CL/edited.dot
 GraphMatchingSoftware_CL/original.dot
+Data/automated_tests/test_master/
+Data/graph_figures/
+Data/inm_unpacked/
+Data/MasterCopies_orb/
+Data/MasterCopies_xml/
+Data/tps_unpacked/
+TpsDataViewer/
 
 # User-specific files
 *.rsuser

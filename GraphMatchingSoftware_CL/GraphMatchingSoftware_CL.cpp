@@ -207,6 +207,7 @@ int main() {
         boost::filesystem::create_directory(dir);
         stringvec GMS_dir;
         read_directory("../Data/automated_tests/" + test_selected + constants::GMS_CL_FOLDER, GMS_dir);
+
         if (GMS_dir.empty()) {
             //copy the .orb files from the test folder into the newly created GMS_CL folder for manipulation
             boost::filesystem::copy_file(constants::PATH_TO_TESTS + test_selected + constants::ORIGINAL_GRAPH_FILENAME, constants::PATH_TO_TESTS + test_selected + constants::GMS_CL_FOLDER + constants::ORIGINAL_GRAPH_FILENAME_ZIP, boost::filesystem::copy_option::overwrite_if_exists);
@@ -251,55 +252,6 @@ int main() {
             return 0;
         }
     };
-
-
-    //create the GMS_CL folder in the specifed automated_tests folder. As it stands the specific test is hardcoded in constants.h
-    boost::filesystem::path dir(constants::PATH_TO_TESTS + test_selected + constants::GMS_CL_FOLDER);
-    boost::filesystem::create_directory(dir);
-    
-    //copy the .orb files from the test folder into the newly created GMS_CL folder for manipulation
-    boost::filesystem::copy_file(constants::PATH_TO_TESTS+test_selected+constants::ORIGINAL_GRAPH_FILENAME, constants::PATH_TO_TESTS+test_selected+constants::GMS_CL_FOLDER+constants::ORIGINAL_GRAPH_FILENAME_ZIP, boost::filesystem::copy_option::overwrite_if_exists);
-    boost::filesystem::copy_file(constants::PATH_TO_TESTS+test_selected+constants::EDITED_GRAPH_FILENAME, constants::PATH_TO_TESTS+test_selected+constants::GMS_CL_FOLDER+constants::EDITED_GRAPH_FILENAME_ZIP, boost::filesystem::copy_option::overwrite_if_exists);
-
-    //extract heirachy structure from .zip file and place in GMS_CL folder. Using scripts and batch file to complete this to save time.
-
-    ofstream batch;
-    batch.open("extract.bat", ios::out);
-    batch << "Powershell Expand-Archive -Path '../Data/automated_tests/" + test_selected +"/GraphMatchingSoftware_CL/original_graph.zip' -DestinationPath ../Data/automated_tests/" + test_selected + "/GraphMatchingSoftware_CL/original_graph\n";
-    batch << "Powershell Expand-Archive -Path '../Data/automated_tests/" + test_selected + "/GraphMatchingSoftware_CL/edited_graph.zip' -DestinationPath ../Data/automated_tests/" + test_selected + "/GraphMatchingSoftware_CL/edited_graph\n";
-    batch.close();
-    std::system("extract.bat");
-    std::remove("extract.bat");
-
-
-    //create vector to hold the nodes derived from test Connectivity.xml file from original
-    vector<string> nodesOriginal = createNodes(constants::PATH_TO_TESTS + test_selected + constants::PATH_TO_ORIGINAL_CON_XML);
-    //create vector to hold edges derived from test Connectivity.xml file from original
-    vector<boost::tuple<int,int>> edgesOriginal = createEdges(constants::PATH_TO_TESTS + test_selected + constants::PATH_TO_ORIGINAL_CON_XML);
-    //create graph for use with isomorphism function and to create .dot file to view graph in gvedit
-    const auto original = create_graph(nodesOriginal, edgesOriginal);
-    ofstream ofso("original.dot");
-    write_graphviz(ofso, original);
-
-    //create vector to hold the nodes derived from test Connectivity.xml file from edited
-    vector<string> nodesEdited = createNodes(constants::PATH_TO_TESTS + test_selected + constants::PATH_TO_EDITED_CON_XML);
-    //create vector to hold edges derived from test Connectivity.xml file from edited
-    vector<boost::tuple<int, int>> edgesEdited = createEdges(constants::PATH_TO_TESTS + test_selected + constants::PATH_TO_EDITED_CON_XML);
-    //create graph for use with isomorphism function and to create .dot file to view graph in gvedit
-    const auto edited = create_graph(nodesEdited, edgesEdited);
-    ofstream ofse("edited.dot");
-    write_graphviz(ofse, edited);
-
-    if (boost::isomorphism(original, edited)) {
-        std::cout << "\nGraphs are isomorphic returning from program. Either data set is valid as there are no differences between them\n";
-        return 0;
-    }
-    else {
-        std::cout << "\nGraphs are different. Performing check to create super graph\n";
-        return 0;
-    }
-
-    
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
