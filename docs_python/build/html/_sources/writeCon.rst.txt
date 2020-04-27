@@ -1,0 +1,7 @@
+writeCon module
+===============
+
+.. automodule:: writeCon
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+writeInfo module
+================
+
+.. automodule:: writeInfo
+   :members:
+   :undoc-members:
+   :show-inheritance:

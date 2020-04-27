@@ -7,6 +7,16 @@ changes_dict = {}
 
 
 def graph_edit(graph, no_of_changes):
+    """Does some stuff
+
+  Args:
+    foo (int): The foo to bar
+    bar (str): Bar to use on foo
+    baz (float): Baz to frobnicate
+
+  Returns:
+    float: The frobnicated baz
+  """
     F = graph
     
     list_of_nodes = list(F.nodes())
@@ -660,7 +670,6 @@ def graph_edit(graph, no_of_changes):
 
     add_limit_node_number = len(F.nodes())
     for node in list_of_nodes:
-        print("Catching nodes with too low degree")
         node
         if F.nodes[node]['type'] == 'DummyNode' and F.degree[node] == 1:
             F.add_node(add_limit_node_number, type="LimitOfNetwork")

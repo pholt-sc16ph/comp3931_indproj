@@ -13,6 +13,13 @@ Data/MasterCopies_orb/
 Data/MasterCopies_xml/
 Data/tps_unpacked/
 TpsDataViewer/
+docs_python/source
+docs_python/make.bat
+docs_python/Makefile
+
+
+# Visual Studio Code settings directory
+.vscode/
 
 # User-specific files
 *.rsuser

@@ -1,3 +1,5 @@
 {
-    "python.pythonPath": "C:\\Users\\peter\\AppData\\Local\\Microsoft\\WindowsApps\\python.exe"
+    "python.pythonPath": "C:\\Users\\peter\\AppData\\Local\\Microsoft\\WindowsApps\\python.exe",
+    "restructuredtext.confPath": "${workspaceFolder}\\docs_python\\source",
+    "python.autoComplete.extraPaths": ["${workspaceFolder}\\CreateTestGraphs_Py"]
 }

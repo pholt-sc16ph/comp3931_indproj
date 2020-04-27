@@ -6,6 +6,16 @@ import random
 
 
 def createGraph(dummy, switch, crossing):
+    """Does some stuff
+
+  Args:
+    foo (int): The foo to bar
+    bar (str): Bar to use on foo
+    baz (float): Baz to frobnicate
+
+  Returns:
+    float: The frobnicated baz
+  """
     G = nx.Graph()
     dummy_counter = dummy
     switch_counter = switch

@@ -21,7 +21,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/foreach.hpp>
-#include <boost/lexical_cast/lexical_cast_old.hpp>
+//#include <boost/lexical_cast/lexical_cast_old.hpp>
 
 #include "constants.h"
 
@@ -169,7 +169,12 @@ void read_directory(const std::string& name, stringvec& v)
     boost::filesystem::directory_iterator end;
     std::transform(start, end, std::back_inserter(v), path_leaf_string());
 }
+/// \file
 
+/// \brief  Main function
+/// \param  argc An integer argument count of the command line arguments
+/// \param  argv An argument vector of the command line arguments
+/// \return an integer 0 upon exit success
 
 
 int main() {

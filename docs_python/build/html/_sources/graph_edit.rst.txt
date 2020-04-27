@@ -1,0 +1,7 @@
+graph\_edit module
+==================
+
+.. automodule:: graph_edit
+   :members:
+   :undoc-members:
+   :show-inheritance:

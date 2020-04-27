@@ -2,6 +2,16 @@ import os
 import fileinput
 
 def replace_in():
+    """Does some stuff
+
+  Args:
+    foo (int): The foo to bar
+    bar (str): Bar to use on foo
+    baz (float): Baz to frobnicate
+
+  Returns:
+    float: The frobnicated baz
+  """
     pre, ext = os.path.splitext("Connectivity.xml")
     os.rename("Connectivity.xml", pre + ".txt")
 

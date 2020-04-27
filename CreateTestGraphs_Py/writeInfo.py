@@ -1,11 +1,29 @@
 import json
 
-
 def print_info(dictionary):
+    """Does some stuff
+
+  Args:
+    foo (int): The foo to bar
+    bar (str): Bar to use on foo
+    baz (float): Baz to frobnicate
+
+  Returns:
+    float: The frobnicated baz
+  """
     print(json.dumps(dictionary, sort_keys=True, indent=4, separators=(',', ': ')))
 
 def write_json_file(dictionary, path):
-    #write the dict to file in json format
+    """Does some stuff
+
+  Args:
+    foo (int): The foo to bar
+    bar (str): Bar to use on foo
+    baz (float): Baz to frobnicate
+
+  Returns:
+    float: The frobnicated baz
+  """
     path_to_save = path + "/changes.json"
     file = open(path_to_save, 'w+')
     file.write(json.dumps(dictionary, sort_keys=True, indent=4))
@@ -13,7 +31,16 @@ def write_json_file(dictionary, path):
     return
 
 def write_text_file(dictionary, path):
+    """Does some stuff
 
+  Args:
+    foo (int): The foo to bar
+    bar (str): Bar to use on foo
+    baz (float): Baz to frobnicate
+
+  Returns:
+    float: The frobnicated baz
+  """
     dict_to_extract = dictionary
     string_array = []
     for key in dict_to_extract:

@@ -6,6 +6,16 @@ import time
 
 
 def writeCon(graph):
+    """Does some stuff
+
+  Args:
+    foo (int): The foo to bar
+    bar (str): Bar to use on foo
+    baz (float): Baz to frobnicate
+
+  Returns:
+    float: The frobnicated baz
+  """
     root_Connectivity = etree.Element("Connectivity", version="1.0", xmlns="https://www.tracsis.com/infrastructure")
     child1_Connectivity = etree.SubElement(root_Connectivity, "Nodes")
     child2_Connectivity = etree.SubElement(root_Connectivity, "TrackSections")

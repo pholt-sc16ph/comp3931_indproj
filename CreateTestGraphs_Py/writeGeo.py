@@ -4,6 +4,16 @@ import os
 import time
 
 def writeGeo(graph, num_nodes, track_dict):
+    """Does some stuff
+
+  Args:
+    foo (int): The foo to bar
+    bar (str): Bar to use on foo
+    baz (float): Baz to frobnicate
+
+  Returns:
+    float: The frobnicated baz
+  """
     xMax = num_nodes * 5
     yMax = num_nodes * 5
     # xNode_position = 0
