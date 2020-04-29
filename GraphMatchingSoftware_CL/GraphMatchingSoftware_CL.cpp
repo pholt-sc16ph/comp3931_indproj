@@ -21,7 +21,6 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/foreach.hpp>
-//#include <boost/lexical_cast/lexical_cast_old.hpp>
 
 #include "constants.h"
 
@@ -41,7 +40,7 @@ Graph create_graph(const vector<string>& names, const vector<boost::tuple<int, i
         return g;
     }
 
-    auto vertex_name_map = get(vertex_name, g); // not boost::get
+    auto vertex_name_map = get(vertex_name, g); 
 
     auto vd_1 = add_vertex(g);
     vertex_name_map[vd_1] = *names.begin();
@@ -50,7 +49,7 @@ Graph create_graph(const vector<string>& names, const vector<boost::tuple<int, i
 
     const auto j = std::end(names);
     auto name_it = std::begin(names);
-    for (++name_it; name_it != j; ++name_it) // Skip first
+    for (++name_it; name_it != j; ++name_it) 
     {
         auto vd_2 = add_vertex(g);
         vertex_name_map[vd_2] = *name_it;
@@ -66,8 +65,7 @@ Graph create_graph(const vector<string>& names, const vector<boost::tuple<int, i
     }
     return g;
 }
-
-//////////////////////////////////////// {{{
+//define the name space for vertex identification
 namespace {
     struct VertexInvariant {
         using Map = map<string, size_t>;
@@ -87,18 +85,16 @@ namespace {
                 size_t next_id = _mappings.size();
                 auto ins = _mappings.insert({ get(vertex_name, _graph, vd), next_id });
                 if (ins.second) {
-                    //std::cout << "Mapped '" << ins.first->first << "' to " << ins.first->second << "\n";
                 }
             }
         }
     };
 }
-//////////////////////////////////////// }}}
+//create nodes reads the Nodes section of the "Connectivity.xml" file of supplied .orb files
 vector<string> createNodes(string path_to_file) {
     vector<string> nodes;
     boost::property_tree::ptree conn;
     boost::property_tree::read_xml(path_to_file, conn);
-    //std::cout << "\nNodes:\n";
     try
     {
         BOOST_FOREACH(boost::property_tree::ptree::value_type const& node, conn.get_child("Connectivity.Nodes"))
@@ -120,13 +116,12 @@ vector<string> createNodes(string path_to_file) {
     }
     return nodes;
 }
-
+//create edges reads the TrackSections section of the "Connectivity.xml" file of supplied .orb files
 vector<boost::tuple<int, int>> createEdges(string path_to_file) {
     vector<boost::tuple<int, int>> edges;
     edges.reserve(50000);
     boost::property_tree::ptree conn;
     boost::property_tree::read_xml(path_to_file, conn);
-    //std::cout << "\nEdges:\n";
     try
     {
         BOOST_FOREACH(boost::property_tree::ptree::value_type const& node, conn.get_child("Connectivity.TrackSections"))
@@ -155,6 +150,7 @@ vector<boost::tuple<int, int>> createEdges(string path_to_file) {
     }
     return edges;
 }
+//read the directory
 struct path_leaf_string
 {
     std::string operator()(const boost::filesystem::directory_entry& entry) const
@@ -169,12 +165,6 @@ void read_directory(const std::string& name, stringvec& v)
     boost::filesystem::directory_iterator end;
     std::transform(start, end, std::back_inserter(v), path_leaf_string());
 }
-/// \file
-
-/// \brief  Main function
-/// \param  argc An integer argument count of the command line arguments
-/// \param  argv An argument vector of the command line arguments
-/// \return an integer 0 upon exit success
 
 
 int main() {
@@ -219,7 +209,6 @@ int main() {
             boost::filesystem::copy_file(constants::PATH_TO_TESTS + test_selected + constants::EDITED_GRAPH_FILENAME, constants::PATH_TO_TESTS + test_selected + constants::GMS_CL_FOLDER + constants::EDITED_GRAPH_FILENAME_ZIP, boost::filesystem::copy_option::overwrite_if_exists);
 
             //extract heirachy structure from .zip file and place in GMS_CL folder. Using scripts and batch file to complete this to save time.
-
             ofstream batch;
             batch.open("extract.bat", ios::out);
             batch << "Powershell Expand-Archive -Path '../Data/automated_tests/" + test_selected + "/GraphMatchingSoftware_CL/original_graph.zip' -DestinationPath ../Data/automated_tests/" + test_selected + "/GraphMatchingSoftware_CL/original_graph\n";
@@ -258,6 +247,7 @@ int main() {
         }
     };
 }
+
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
 // Debug program: F5 or Debug > Start Debugging menu

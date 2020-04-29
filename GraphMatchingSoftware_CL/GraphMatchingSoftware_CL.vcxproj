@@ -149,6 +149,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GraphMatchingSoftware_CL.cpp" />
+    <ClCompile Include="graphs.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="codesamples.txt" />
