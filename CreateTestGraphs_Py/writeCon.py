@@ -5,7 +5,7 @@ import time
 
 
 
-def writeCon(graph):
+def write_con(graph):
     """Does some stuff
 
   Args:

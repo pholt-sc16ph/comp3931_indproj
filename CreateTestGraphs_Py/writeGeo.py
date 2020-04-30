@@ -3,7 +3,7 @@ import random
 import os
 import time
 
-def writeGeo(graph, num_nodes, track_dict):
+def write_geo(graph, num_nodes, track_dict):
     """Does some stuff
 
   Args:

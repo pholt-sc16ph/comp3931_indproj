@@ -18,9 +18,6 @@
     <ClCompile Include="GraphMatchingSoftware_CL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="graphs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="codesamples.txt" />
