@@ -1,0 +1,7 @@
+folderManagement module
+=======================
+
+.. automodule:: folderManagement
+   :members:
+   :undoc-members:
+   :show-inheritance:

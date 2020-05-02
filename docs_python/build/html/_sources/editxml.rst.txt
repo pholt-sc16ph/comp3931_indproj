@@ -1,7 +1,0 @@
-editxml module
-==============
-
-.. automodule:: editxml
-   :members:
-   :undoc-members:
-   :show-inheritance:

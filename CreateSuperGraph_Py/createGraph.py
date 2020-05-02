@@ -1,11 +1,13 @@
 import networkx as nx
 from lxml import etree
 import matplotlib.pyplot as plt
+from networkx.drawing.nx_agraph import write_dot
+
 
 
 def create_graph(path):
     
-    G = nx.Graph()
+    G = nx.MultiGraph()
     tree = etree.parse(path)
     root = tree.getroot()
     
@@ -39,3 +41,6 @@ def create_graphviz_files(inm, tps, path):
     nx.write(inm, path + "inm/inm.dot")
     nx.draw_graphviz(tps)
     nx.write(tps, path + "tps/tps.dot")
+
+
+    

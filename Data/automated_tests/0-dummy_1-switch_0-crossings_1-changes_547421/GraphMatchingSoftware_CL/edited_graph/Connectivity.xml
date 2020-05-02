@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Connectivity version="1.0" xmlns="https://www.tracsis.com/infrastructure">
+  <Nodes>
+    <Switch id="1" in="tr_1" outMain="tr_2" outBranch="tr_3" branchDirection="Right"/>
+    <LimitOfNetwork id="2" type="Unknown" track="tr_1"/>
+    <LimitOfNetwork id="3" type="Unknown" track="tr_2"/>
+    <DummyNode id="0" in="tr_3" out="tr_4"/>
+    <LimitOfNetwork id="4" type="Unknown" track="tr_4"/>
+  </Nodes>
+  <TrackSections>
+    <TrackSection id="tr_1" length="100" startNode="1" endNode="2"/>
+    <TrackSection id="tr_2" length="100" startNode="1" endNode="3"/>
+    <TrackSection id="tr_3" length="100" startNode="1" endNode="0"/>
+    <TrackSection id="tr_4" length="100" startNode="0" endNode="4"/>
+  </TrackSections>
+</Connectivity>

@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Layout version="1.0" xMin="0" yMin="0" xMax="120" yMax="120" xmlns="https://www.tracsis.com/infrastructure">
+  <NodePositions>
+    <NodePosition id="0" x="98" y="76"/>
+    <NodePosition id="1" x="24" y="64"/>
+    <NodePosition id="2" x="78" y="48"/>
+    <NodePosition id="3" x="105" y="2"/>
+    <NodePosition id="4" x="86" y="52"/>
+    <NodePosition id="5" x="69" y="12"/>
+    <NodePosition id="6" x="88" y="9"/>
+    <NodePosition id="7" x="96" y="17"/>
+    <NodePosition id="8" x="70" y="98"/>
+    <NodePosition id="9" x="85" y="61"/>
+    <NodePosition id="10" x="50" y="10"/>
+    <NodePosition id="11" x="57" y="77"/>
+    <NodePosition id="12" x="19" y="14"/>
+    <NodePosition id="13" x="89" y="6"/>
+    <NodePosition id="14" x="6" y="58"/>
+    <NodePosition id="15" x="111" y="42"/>
+    <NodePosition id="16" x="3" y="111"/>
+    <NodePosition id="17" x="56" y="100"/>
+    <NodePosition id="18" x="0" y="101"/>
+    <NodePosition id="19" x="30" y="46"/>
+    <NodePosition id="20" x="21" y="26"/>
+    <NodePosition id="21" x="93" y="30"/>
+    <NodePosition id="22" x="9" y="73"/>
+    <NodePosition id="23" x="17" y="30"/>
+  </NodePositions>
+  <TrackSectionPositions>
+    <TrackSectionPosition id="tr_1">
+      <Point x="98" y="76"/>
+      <Point x="24" y="64"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_2">
+      <Point x="24" y="64"/>
+      <Point x="78" y="48"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_3">
+      <Point x="24" y="64"/>
+      <Point x="69" y="12"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_4">
+      <Point x="24" y="64"/>
+      <Point x="88" y="9"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_5">
+      <Point x="78" y="48"/>
+      <Point x="105" y="2"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_6">
+      <Point x="105" y="2"/>
+      <Point x="86" y="52"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_7">
+      <Point x="105" y="2"/>
+      <Point x="69" y="12"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_8">
+      <Point x="86" y="52"/>
+      <Point x="88" y="9"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_9">
+      <Point x="69" y="12"/>
+      <Point x="88" y="9"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_10">
+      <Point x="88" y="9"/>
+      <Point x="96" y="17"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_11">
+      <Point x="96" y="17"/>
+      <Point x="70" y="98"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_12">
+      <Point x="96" y="17"/>
+      <Point x="85" y="61"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_13">
+      <Point x="70" y="98"/>
+      <Point x="50" y="10"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_14">
+      <Point x="85" y="61"/>
+      <Point x="57" y="77"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_15">
+      <Point x="85" y="61"/>
+      <Point x="89" y="6"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_16">
+      <Point x="50" y="10"/>
+      <Point x="57" y="77"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_17">
+      <Point x="57" y="77"/>
+      <Point x="19" y="14"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_18">
+      <Point x="57" y="77"/>
+      <Point x="6" y="58"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_19">
+      <Point x="19" y="14"/>
+      <Point x="89" y="6"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_20">
+      <Point x="19" y="14"/>
+      <Point x="3" y="111"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_21">
+      <Point x="19" y="14"/>
+      <Point x="0" y="101"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_22">
+      <Point x="89" y="6"/>
+      <Point x="6" y="58"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_23">
+      <Point x="6" y="58"/>
+      <Point x="111" y="42"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_24">
+      <Point x="111" y="42"/>
+      <Point x="3" y="111"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_25">
+      <Point x="3" y="111"/>
+      <Point x="56" y="100"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_26">
+      <Point x="3" y="111"/>
+      <Point x="30" y="46"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_27">
+      <Point x="56" y="100"/>
+      <Point x="21" y="26"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_28">
+      <Point x="56" y="100"/>
+      <Point x="93" y="30"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_29">
+      <Point x="56" y="100"/>
+      <Point x="9" y="73"/>
+    </TrackSectionPosition>
+    <TrackSectionPosition id="tr_30">
+      <Point x="0" y="101"/>
+      <Point x="17" y="30"/>
+    </TrackSectionPosition>
+  </TrackSectionPositions>
+  <LocationLabels/>
+</Layout>

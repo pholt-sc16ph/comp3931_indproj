@@ -1,0 +1,28 @@
+{
+    "1": {
+        "action_completed": "swapwithcrossingnode",
+        "node_acted_upon": [
+            11,
+            "LimitOfNetwork"
+        ],
+        "node_swapped_or_added": [
+            11,
+            "FlatCrossing"
+        ],
+        "nodes_created": [
+            [
+                16,
+                "LimitOfNetwork"
+            ],
+            [
+                17,
+                "LimitOfNetwork"
+            ],
+            [
+                18,
+                "LimitOfNetwork"
+            ]
+        ],
+        "nodes_deleted": []
+    }
+}

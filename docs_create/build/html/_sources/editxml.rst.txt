@@ -1,0 +1,7 @@
+editXml module
+==============
+
+.. automodule:: editXml
+   :members:
+   :undoc-members:
+   :show-inheritance:

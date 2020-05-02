@@ -1,0 +1,240 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>createTests &#8212; Graph Matching Software 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Graph Matching Software 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for createTests</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/python</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+
+<span class="kn">from</span> <span class="nn">graphOrig</span> <span class="kn">import</span> <span class="n">create_graph</span>
+<span class="kn">from</span> <span class="nn">graphEdit</span> <span class="kn">import</span> <span class="n">graph_edit</span><span class="p">,</span> <span class="n">changes_dict</span>
+<span class="kn">from</span> <span class="nn">editXml</span> <span class="kn">import</span> <span class="n">replace_in</span>
+<span class="kn">from</span> <span class="nn">writeGeo</span> <span class="kn">import</span> <span class="n">write_geo</span>
+<span class="kn">from</span> <span class="nn">writeCon</span> <span class="kn">import</span> <span class="n">write_con</span>
+<span class="kn">from</span> <span class="nn">writeInfo</span> <span class="kn">import</span> <span class="n">print_info</span><span class="p">,</span> <span class="n">write_json_file</span><span class="p">,</span> <span class="n">write_text_file</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../createTests.html#createTests.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+
+    <span class="sd">&quot;&quot;&quot;While loop to keep the program running and to accept user input so that the test sets can be generated as an when they are needed.</span>
+<span class="sd">    The program will create one graph randomly using the data supplied which is then used to create the files to be read by TPSDataviewer.</span>
+<span class="sd">    The graph which is produced is then edited slightly so as to create another set of files which can be read by TPSDataviewer but with a number of </span>
+<span class="sd">    differences (requested by the user)</span>
+<span class="sd">    For example :</span>
+<span class="sd">    User requests a graph with 3 switches and 3 crossings, this might produce a graph with 3 limit of networks. If the user selects one difference, </span>
+<span class="sd">    then one of these limits is changed into a switch or a crossing and the required number of limit of network nodes are added. This then produces a</span>
+<span class="sd">    set of two graphs which are basically the same with minor differences.</span>
+<span class="sd">    The data sets can be made complex with many differences which should represent the final data set to be worked on</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">switch_number</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">crossing_number</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">number_differences</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="c1"># dummy_number = 10</span>
+        <span class="c1"># switch_number = 10</span>
+        <span class="c1"># crossing_number = 10</span>
+        <span class="c1"># number_differences = 5</span>
+        <span class="n">dummy_number</span> <span class="o">=</span> <span class="nb">input</span> <span class="p">(</span><span class="s2">&quot;Choose number of dummy nodes in original graph: &quot;</span><span class="p">)</span>
+        <span class="n">switch_number</span> <span class="o">=</span> <span class="nb">input</span> <span class="p">(</span><span class="s2">&quot;Choose number of switch nodes in original graph: &quot;</span><span class="p">)</span>
+        <span class="n">crossing_number</span> <span class="o">=</span> <span class="nb">input</span> <span class="p">(</span><span class="s2">&quot;Choose number of crossing nodes in original graph: &quot;</span><span class="p">)</span>
+        <span class="n">number_differences</span> <span class="o">=</span> <span class="nb">input</span> <span class="p">(</span><span class="s2">&quot;Choose the number of differences between original graph and edited graph: &quot;</span><span class="p">)</span>
+        <span class="k">break</span>  
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create original graph and write to a new folder in /Data/automated_tests. The new folder will be named to detail the</span>
+<span class="sd">    graphs it contains. An example folder name would be:</span>
+<span class="sd">    &quot;/Data/automated_tests/1-dummy_2-switches_2-crossings_1-changes_45633&quot; (number on the end is a random unique ID to allow </span>
+<span class="sd">    folders with the same criteria to be created).</span>
+<span class="sd">    Inside this folder will have two .orb files, one named original.orb and one named edited.orb, and a .txt file named changes.txt</span>
+<span class="sd">    containing the differences between the two graphs. </span>
+<span class="sd">    An example of the text file would look like:</span>
+
+<span class="sd">    2 changes:</span>
+<span class="sd">    node number: 4(&quot;LimitOfNetwork&quot;) swapped with node number: 4(&quot;Switch&quot;) - nodes created as a result: 15(&quot;LimitOfNetwork&quot;) and 16(&quot;LimitOfNetwork&quot;)</span>
+<span class="sd">    node number: 7(&quot;Switch&quot;) deleted - nodes deleted as a result: 9(&quot;LimitOfNetwork&quot;) and 10(&quot;LimitOfNetwork&quot;)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path_to_automated_tests</span> <span class="o">=</span> <span class="s2">&quot;../Data/automated_tests/&quot;</span>
+    <span class="n">random_file_number</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">100000</span><span class="p">,</span> <span class="mi">999999</span><span class="p">)</span>
+    <span class="n">directory_string</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">dummy_number</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-dummy_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">switch_number</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-switch_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">crossing_number</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-crossings_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">number_differences</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-changes_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">random_file_number</span><span class="p">)</span>
+    <span class="n">new_directory</span> <span class="o">=</span> <span class="n">path_to_automated_tests</span> <span class="o">+</span> <span class="n">directory_string</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">new_directory</span><span class="p">)</span>
+
+
+    <span class="c1"># G is the main graph produced, this is different each time create.py is run</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">create_graph</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">dummy_number</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="n">switch_number</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">crossing_number</span><span class="p">))</span>
+    <span class="n">number_of_nodes</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">number_of_nodes</span><span class="p">()</span>
+    <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># use graph created to write Connectivity.xml</span>
+    <span class="c1"># writeCon() returns a dictionary for use in writeGeo()</span>
+    <span class="n">track_dict_original</span> <span class="o">=</span> <span class="n">write_con</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="c1"># use graph created to write Geographic.xml and place in Layout folder</span>
+    <span class="n">write_geo</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">number_of_nodes</span><span class="p">,</span> <span class="n">track_dict_original</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot; to display graphs uncomment the below code &quot;&quot;&quot;</span>
+
+    <span class="c1">#display both graphs for troubleshooting</span>
+    <span class="c1"># elarge1 =[(u,v) for (u,v,d) in G.edges(data=True)]</span>
+    <span class="n">pos1</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">G</span><span class="p">,</span><span class="n">pos1</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">font_weight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> 
+    <span class="c1"># plt.draw()</span>
+
+    <span class="c1">#call function to replace &quot;in_&quot; with &quot;in&quot; in the Connectivity.xml file</span>
+    <span class="n">replace_in</span><span class="p">()</span>
+
+    <span class="n">zfName</span> <span class="o">=</span> <span class="s2">&quot;original_graph.zip&quot;</span>
+    <span class="n">foo</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zfName</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">foo</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Connectivity.xml&quot;</span><span class="p">)</span>
+    <span class="c1"># Adding files from directory &#39;files&#39;</span>
+    <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="s1">&#39;Layout&#39;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="n">foo</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+    <span class="n">foo</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="n">pre</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">zfName</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">zfName</span><span class="p">,</span> <span class="n">pre</span> <span class="o">+</span> <span class="s2">&quot;.orb&quot;</span><span class="p">)</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;Connectivity.xml&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;Layout/Geographic.xml&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">removedirs</span><span class="p">(</span><span class="s2">&quot;Layout&quot;</span><span class="p">)</span>
+
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="s1">&#39;original_graph.orb&#39;</span><span class="p">,</span> <span class="n">new_directory</span><span class="p">)</span>
+
+
+
+    <span class="n">F</span> <span class="o">=</span> <span class="n">graph_edit</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">number_differences</span><span class="p">))</span>
+    <span class="n">number_of_nodes</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">number_of_nodes</span><span class="p">()</span>
+    <span class="n">F</span><span class="o">.</span><span class="n">nodes</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># use graph created to write Connectivity.xml</span>
+    <span class="c1"># writeCon() returns a dictionary for use in writeGeo()</span>
+    <span class="n">track_dict_edited</span> <span class="o">=</span> <span class="n">write_con</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+    <span class="c1"># use graph created to write Geographic.xml and place in Layout folder</span>
+    <span class="n">write_geo</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">number_of_nodes</span><span class="p">,</span> <span class="n">track_dict_edited</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot; to display graphs uncomment the below code &quot;&quot;&quot;</span>
+
+    <span class="c1"># elarge2 =[(u,v) for (u,v,d) in F.edges(data=True)]</span>
+    <span class="n">pos2</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">pos2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># Shift the x values of every node by 3 to the right</span>
+        <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span><span class="mi">3</span>
+    <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">F</span><span class="p">,</span><span class="n">pos2</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">font_weight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> <span class="c1"># display</span>
+    <span class="c1"># plt.draw()</span>
+
+    <span class="c1">#call function to replace &quot;in_&quot; with &quot;in&quot; in the Connectivity.xml file</span>
+    <span class="n">replace_in</span><span class="p">()</span>
+
+
+    <span class="n">zfName</span> <span class="o">=</span> <span class="s2">&quot;edited_graph.zip&quot;</span>
+    <span class="n">foo</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zfName</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">foo</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Connectivity.xml&quot;</span><span class="p">)</span>
+    <span class="c1"># Adding files from directory &#39;files&#39;</span>
+    <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="s1">&#39;Layout&#39;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="n">foo</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+    <span class="n">foo</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="n">pre</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">zfName</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">zfName</span><span class="p">,</span> <span class="n">pre</span> <span class="o">+</span> <span class="s2">&quot;.orb&quot;</span><span class="p">)</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;Connectivity.xml&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;Layout/Geographic.xml&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">removedirs</span><span class="p">(</span><span class="s2">&quot;Layout&quot;</span><span class="p">)</span>
+
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="s1">&#39;edited_graph.orb&#39;</span><span class="p">,</span> <span class="n">new_directory</span><span class="p">)</span>
+
+    <span class="c1"># print_info(changes_dict)</span>
+    <span class="n">write_json_file</span><span class="p">(</span><span class="n">changes_dict</span><span class="p">,</span> <span class="n">new_directory</span><span class="p">)</span>
+    <span class="n">write_text_file</span><span class="p">(</span><span class="n">changes_dict</span><span class="p">,</span> <span class="n">new_directory</span><span class="p">)</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Graph Matching Software 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Peter Holt sc16ph.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+    </div>
+  </body>
+</html>

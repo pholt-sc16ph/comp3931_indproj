@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Connectivity version="1.0" xmlns="https://www.tracsis.com/infrastructure">
+  <Nodes>
+    <LimitOfNetwork id="0" type="Unknown" track="tr_1"/>
+    <FlatCrossing id="1" inMain="tr_1" outMain="tr_2" inCross="tr_3" outCross="tr_4" direction="RightToLeft"/>
+    <Switch id="2" in="tr_2" outMain="tr_5" outBranch="tr_6" branchDirection="Right"/>
+    <DummyNode id="3" in="tr_5" out="tr_7"/>
+    <FlatCrossing id="4" inMain="tr_6" outMain="tr_3" inCross="tr_8" outCross="tr_9" direction="RightToLeft"/>
+    <FlatCrossing id="5" inMain="tr_4" outMain="tr_10" inCross="tr_11" outCross="tr_12" direction="RightToLeft"/>
+    <Switch id="6" in="tr_10" outMain="tr_13" outBranch="tr_14" branchDirection="Right"/>
+    <DummyNode id="7" in="tr_8" out="tr_15"/>
+    <DummyNode id="8" in="tr_7" out="tr_16"/>
+    <Switch id="9" in="tr_16" outMain="tr_13" outBranch="tr_17" branchDirection="Right"/>
+    <LimitOfNetwork id="10" type="Unknown" track="tr_9"/>
+    <LimitOfNetwork id="11" type="Unknown" track="tr_11"/>
+    <LimitOfNetwork id="12" type="Unknown" track="tr_12"/>
+    <LimitOfNetwork id="13" type="Unknown" track="tr_14"/>
+    <LimitOfNetwork id="14" type="Unknown" track="tr_15"/>
+    <LimitOfNetwork id="15" type="Unknown" track="tr_17"/>
+  </Nodes>
+  <TrackSections>
+    <TrackSection id="tr_1" length="100" startNode="0" endNode="1"/>
+    <TrackSection id="tr_2" length="100" startNode="1" endNode="2"/>
+    <TrackSection id="tr_3" length="100" startNode="1" endNode="4"/>
+    <TrackSection id="tr_4" length="100" startNode="1" endNode="5"/>
+    <TrackSection id="tr_5" length="100" startNode="2" endNode="3"/>
+    <TrackSection id="tr_6" length="100" startNode="2" endNode="4"/>
+    <TrackSection id="tr_7" length="100" startNode="3" endNode="8"/>
+    <TrackSection id="tr_8" length="100" startNode="4" endNode="7"/>
+    <TrackSection id="tr_9" length="100" startNode="4" endNode="10"/>
+    <TrackSection id="tr_10" length="100" startNode="5" endNode="6"/>
+    <TrackSection id="tr_11" length="100" startNode="5" endNode="11"/>
+    <TrackSection id="tr_12" length="100" startNode="5" endNode="12"/>
+    <TrackSection id="tr_13" length="100" startNode="6" endNode="9"/>
+    <TrackSection id="tr_14" length="100" startNode="6" endNode="13"/>
+    <TrackSection id="tr_15" length="100" startNode="7" endNode="14"/>
+    <TrackSection id="tr_16" length="100" startNode="8" endNode="9"/>
+    <TrackSection id="tr_17" length="100" startNode="9" endNode="15"/>
+  </TrackSections>
+</Connectivity>

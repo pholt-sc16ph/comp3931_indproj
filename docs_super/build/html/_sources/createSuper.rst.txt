@@ -1,0 +1,7 @@
+createSuper module
+==================
+
+.. automodule:: createSuper
+   :members:
+   :undoc-members:
+   :show-inheritance:

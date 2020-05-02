@@ -4,17 +4,14 @@ import os
 import time
 
 
-
 def write_con(graph):
-    """Does some stuff
+    """Writes Connectivity.xml following Tracsis rules
 
   Args:
-    foo (int): The foo to bar
-    bar (str): Bar to use on foo
-    baz (float): Baz to frobnicate
+    graph (Graph): Graph to write XML from
 
   Returns:
-    float: The frobnicated baz
+    dict: A dictionary of connectivity
   """
     root_Connectivity = etree.Element("Connectivity", version="1.0", xmlns="https://www.tracsis.com/infrastructure")
     child1_Connectivity = etree.SubElement(root_Connectivity, "Nodes")

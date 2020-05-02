@@ -1,28 +1,26 @@
 import json
-
+"""
+Methods to keep track of the changes made between the original graph and the edited graph
+"""
 def print_info(dictionary):
-    """Does some stuff
+    """Print to terminal
 
   Args:
-    foo (int): The foo to bar
-    bar (str): Bar to use on foo
-    baz (float): Baz to frobnicate
+    dictionary (dict): Dictionary of changes
 
   Returns:
-    float: The frobnicated baz
+    void:
   """
     print(json.dumps(dictionary, sort_keys=True, indent=4, separators=(',', ': ')))
 
 def write_json_file(dictionary, path):
-    """Does some stuff
+    """Print to json file for future parsing
 
   Args:
-    foo (int): The foo to bar
-    bar (str): Bar to use on foo
-    baz (float): Baz to frobnicate
+    dictionary (dict): Dictionary of changes
 
   Returns:
-    float: The frobnicated baz
+    void:
   """
     path_to_save = path + "/changes.json"
     file = open(path_to_save, 'w+')
@@ -31,15 +29,13 @@ def write_json_file(dictionary, path):
     return
 
 def write_text_file(dictionary, path):
-    """Does some stuff
+    """Print to human readable text file
 
   Args:
-    foo (int): The foo to bar
-    bar (str): Bar to use on foo
-    baz (float): Baz to frobnicate
+    dictionary (dict): Dictionary of changes
 
   Returns:
-    float: The frobnicated baz
+    void:
   """
     dict_to_extract = dictionary
     string_array = []

@@ -4,15 +4,15 @@ import os
 import time
 
 def write_geo(graph, num_nodes, track_dict):
-    """Does some stuff
+    """Writes Geographic.xml following Tracsis rules
 
   Args:
-    foo (int): The foo to bar
-    bar (str): Bar to use on foo
-    baz (float): Baz to frobnicate
+    graph (Graph): The graph to write coordinate data on
+    num_nodes (int): The number of nodes in the graph used to determine plot area
+    track_dict (dict): A dictionary holding the track information
 
   Returns:
-    float: The frobnicated baz
+    void: 
   """
     xMax = num_nodes * 5
     yMax = num_nodes * 5

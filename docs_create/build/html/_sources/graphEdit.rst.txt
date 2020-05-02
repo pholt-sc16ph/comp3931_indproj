@@ -1,0 +1,7 @@
+graphEdit module
+================
+
+.. automodule:: graphEdit
+   :members:
+   :undoc-members:
+   :show-inheritance:

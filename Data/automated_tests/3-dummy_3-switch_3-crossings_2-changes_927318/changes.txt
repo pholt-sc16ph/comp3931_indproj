@@ -1,0 +1,4 @@
+Change Number: 1 -- Action Taken: Swap with Switch || Node Changed: (6, 'DummyNode') || Node Swapped With: (6, 'Switch') || Nodes Created:  (14, 'LimitOfNetwork') || Nodes Deleted:  
+
+Change Number: 2 -- Action Taken: Swap with FlatCrossing || Node Changed: (12, 'LimitOfNetwork') || Node Swapped With: (12, 'FlatCrossing') || Nodes Created:  (15, 'LimitOfNetwork')(16, 'LimitOfNetwork')(17, 'LimitOfNetwork') || Nodes Deleted:  
+

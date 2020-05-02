@@ -6,15 +6,15 @@ import random
 
 
 def create_graph(dummy, switch, crossing):
-    """Does some stuff
+    """Creates graph structure
 
   Args:
-    foo (int): The foo to bar
-    bar (str): Bar to use on foo
-    baz (float): Baz to frobnicate
+    dummy (int): Number of DummyNode
+    switch (int): Number of Switch
+    crossing (int): Number of FlatCrossing
 
   Returns:
-    float: The frobnicated baz
+    Graph: Graph structure to be used to write XML
   """
     G = nx.Graph()
     dummy_counter = dummy
@@ -162,11 +162,5 @@ def create_graph(dummy, switch, crossing):
             G.add_node(add_limit_node_number, type="LimitOfNetwork")
             G.add_edge(node, add_limit_node_number)
             add_limit_node_number += 1
-    """Graph data for originally made graph"""
-    """
-    print("Data and graph for G")
-    print(type(nx.number_connected_components(G)))
-    print(nx.info(G)) 
-    print("\n")
-    """
+
     return G

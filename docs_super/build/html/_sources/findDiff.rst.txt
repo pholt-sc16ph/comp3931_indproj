@@ -1,0 +1,7 @@
+findDiff module
+===============
+
+.. automodule:: findDiff
+   :members:
+   :undoc-members:
+   :show-inheritance:

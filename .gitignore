@@ -12,14 +12,18 @@ Data/inm_unpacked/
 Data/MasterCopies_orb/
 Data/MasterCopies_xml/
 Data/tps_unpacked/
-Data/tracsis_tests/
 Data/tracsis_master_tests/
+Data/tracsis_tests/
 Data/manual_tests/Graph_A.xml
 Data/manual_tests/Graph_B.xml
 TpsDataViewer/
-docs_python/source
-docs_python/make.bat
-docs_python/Makefile
+docs_create/source
+docs_create/make.bat
+docs_create/Makefile
+docs_super/source
+docs_super/make.bat
+docs_super/Makefile
+aa_test_folder
 
 
 # Visual Studio Code settings directory

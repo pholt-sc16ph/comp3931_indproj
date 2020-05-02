@@ -1,0 +1,7 @@
+removeDummy module
+==================
+
+.. automodule:: removeDummy
+   :members:
+   :undoc-members:
+   :show-inheritance:

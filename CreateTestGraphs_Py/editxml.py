@@ -2,15 +2,10 @@ import os
 import fileinput
 
 def replace_in():
-    """Does some stuff
-
-  Args:
-    foo (int): The foo to bar
-    bar (str): Bar to use on foo
-    baz (float): Baz to frobnicate
-
+    """Used to replace the word *in_* in the Connectivity.xml files with the word *in* as the word *in* is a reserved word in python so it was unable to be used in the construction of the attributes of the XML
+    
   Returns:
-    float: The frobnicated baz
+    float: Void
   """
     pre, ext = os.path.splitext("Connectivity.xml")
     os.rename("Connectivity.xml", pre + ".txt")

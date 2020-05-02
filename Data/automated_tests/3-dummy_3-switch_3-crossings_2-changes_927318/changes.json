@@ -1,0 +1,46 @@
+{
+    "1": {
+        "action_completed": "swapwithswitchnode",
+        "node_acted_upon": [
+            6,
+            "DummyNode"
+        ],
+        "node_swapped_or_added": [
+            6,
+            "Switch"
+        ],
+        "nodes_created": [
+            [
+                14,
+                "LimitOfNetwork"
+            ]
+        ],
+        "nodes_deleted": []
+    },
+    "2": {
+        "action_completed": "swapwithcrossingnode",
+        "node_acted_upon": [
+            12,
+            "LimitOfNetwork"
+        ],
+        "node_swapped_or_added": [
+            12,
+            "FlatCrossing"
+        ],
+        "nodes_created": [
+            [
+                15,
+                "LimitOfNetwork"
+            ],
+            [
+                16,
+                "LimitOfNetwork"
+            ],
+            [
+                17,
+                "LimitOfNetwork"
+            ]
+        ],
+        "nodes_deleted": []
+    }
+}

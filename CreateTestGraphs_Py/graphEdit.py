@@ -7,15 +7,14 @@ changes_dict = {}
 
 
 def graph_edit(graph, no_of_changes):
-    """Does some stuff
+    """Edits the supplied Graph with random changes by the amount specified
 
   Args:
-    foo (int): The foo to bar
-    bar (str): Bar to use on foo
-    baz (float): Baz to frobnicate
+    graph (Graph): Graph to be edited
+    no_of_changes (int): Number of changes to be made
 
   Returns:
-    float: The frobnicated baz
+    Graph: Graph structure to be used to write XML
   """
     F = graph
     
@@ -41,17 +40,6 @@ def graph_edit(graph, no_of_changes):
         random_action = random.choice(random_choice_list)
         changes_dict[x+1]['action_completed'] = random_action
         changes_dict[x+1]['node_acted_upon'] = random_node_info_for_dict
-
-        # for node in F:
-        #     if F.nodes[node]['type'] == 'Switch' and F.degree[node] == 3:
-        #         if node in list_of_nodes:
-        #             list_of_nodes.remove(node)
-        #     elif F.nodes[node]['type'] == 'FlatCrossing' and F.degree[node] == 4:
-        #         if node in list_of_nodes:
-        #             list_of_nodes.remove(node)
-        #     elif F.nodes[node]['type'] == 'DummyNode' and F.degree[node] == 2:
-        #         if node in list_of_nodes:
-        #             list_of_nodes.remove(node)
 
         if random_action == "swapwithlimit":
             F.remove_node(random_node)
@@ -663,7 +651,6 @@ def graph_edit(graph, no_of_changes):
                     F.add_edge(lost_nodes[1], random_node_neighbors[0])
                     F.add_edge(lost_nodes[1], random_node_neighbors[1])
 
-        
         changes_dict[x+1]["nodes_created"] = list_of_nodes_added_during_change
         changes_dict[x+1]["nodes_deleted"] = list_of_nodes_deleted_during_change
     
@@ -778,40 +765,11 @@ def graph_edit(graph, no_of_changes):
             F.add_edge(node, add_limit_node_number)
             add_limit_node_number += 1
 
-
-        
         changes_dict[x+1]["nodes_created"] = list_of_nodes_added_during_change
         changes_dict[x+1]["nodes_deleted"] = list_of_nodes_deleted_during_change
     
-    """
-    # catch if node zero was deleted. Clear the graph and populate with one node, node zero
-    for node in F:
-        list_of_end_process = []
-        list_of_end_process.append(node)
-    if 0 not in list_of_end_process:
-        F.clear()
-        F.add_node(0, type="LimitOfNetwork")
-    
-    # catch if deleting a node caused a cluster of node tp be separated from the main group. this cluster needs deleting
-    deleted_nodes_cluster = []
-    for node in F:
-        if node not in nx.node_connected_component(F, 0):
-            deleted_nodes_cluster.append(node)
-    if not deleted_nodes_cluster:
-        F.remove_nodes_from(deleted_nodes_cluster)
-
-    """
     F.nodes(data=True)
-    """ Graph data for edited graph"""
-    """
-    print("Data and graph for F")
-    print(nx.node_connected_component(F, 0))
-    print(deleted_nodes_cluster)
-    print(nx.number_connected_components(F))
-    print(nx.info(F))
-    print("\n")
-    """
-
+    
     return F
 
 
