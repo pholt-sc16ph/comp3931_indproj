@@ -1,0 +1,184 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>createGraph &#8212; Graph Matching Software 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Graph Matching Software 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for createGraph</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">networkx.drawing.nx_agraph</span> <span class="kn">import</span> <span class="n">write_dot</span>
+
+
+
+<div class="viewcode-block" id="create_graph"><a class="viewcode-back" href="../createGraph.html#createGraph.create_graph">[docs]</a><span class="k">def</span> <span class="nf">create_graph</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a graph </span>
+<span class="sd">  </span>
+<span class="sd">  Args:</span>
+<span class="sd">    path (String): Path to folder containing XML documents</span>
+<span class="sd">  </span>
+<span class="sd">  Returns:</span>
+<span class="sd">    Graph: Graph to be used as either a base graph or additional graph</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">()</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+    
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">root</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">)</span>
+        <span class="n">node_type</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">node_id</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
+        <span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">node_type</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">root</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">edge_start</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;startNode&quot;</span><span class="p">)</span>
+        <span class="n">edge_end</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;endNode&quot;</span><span class="p">)</span>
+        <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">edge_start</span><span class="p">,</span> <span class="n">edge_end</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">G</span></div>
+
+
+<div class="viewcode-block" id="display_graphs"><a class="viewcode-back" href="../createGraph.html#createGraph.display_graphs">[docs]</a><span class="k">def</span> <span class="nf">display_graphs</span><span class="p">(</span><span class="n">graph_A</span><span class="p">,</span> <span class="n">graph_B</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Display graphs to user for troubleshooting - two graphs</span>
+<span class="sd">  </span>
+<span class="sd">  Args:</span>
+<span class="sd">    graph_A (Graph): Graph structure to be displayed using matplotlib draw</span>
+<span class="sd">    graph_B (Graph): Graph structure to be displayed using matplotlib draw </span>
+
+
+<span class="sd">  Returns:</span>
+<span class="sd">    float: Void</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+    <span class="n">pos1</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="n">graph_A</span><span class="p">)</span>
+    <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">graph_A</span><span class="p">,</span><span class="n">pos1</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">font_weight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">pos2</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="n">graph_B</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">pos2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># Shift the x values of every node by 3 to the right</span>
+        <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span><span class="mi">3</span>
+    <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">graph_B</span><span class="p">,</span><span class="n">pos2</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">font_weight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> </div>
+
+<div class="viewcode-block" id="display_three_graphs"><a class="viewcode-back" href="../createGraph.html#createGraph.display_three_graphs">[docs]</a><span class="k">def</span> <span class="nf">display_three_graphs</span><span class="p">(</span><span class="n">graph_A</span><span class="p">,</span> <span class="n">graph_B</span><span class="p">,</span> <span class="n">graph_C</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Display graphs to user for troubleshooting - three graphs</span>
+<span class="sd">  </span>
+<span class="sd">  Args:</span>
+<span class="sd">    graph_A (Graph): Graph structure to be displayed using matplotlib draw</span>
+<span class="sd">    graph_B (Graph): Graph structure to be displayed using matplotlib draw</span>
+<span class="sd">    graph_C (Graph): Graph structure to be displayed using matplotlib draw</span>
+
+
+<span class="sd">  Returns:</span>
+<span class="sd">    float: Void</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+    <span class="n">pos1</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="n">graph_A</span><span class="p">)</span>
+    <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">graph_A</span><span class="p">,</span><span class="n">pos1</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">font_weight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">pos2</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="n">graph_B</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">pos2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># Shift the x values of every node by 3 to the right</span>
+        <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span><span class="mi">3</span>
+    <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">graph_B</span><span class="p">,</span><span class="n">pos2</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">font_weight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">pos3</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="n">graph_C</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">pos3</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># Shift the x values of every node by 3 to the right</span>
+        <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span><span class="mi">6</span>
+    <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">graph_C</span><span class="p">,</span><span class="n">pos3</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">font_weight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="create_graphviz_files"><a class="viewcode-back" href="../createGraph.html#createGraph.create_graphviz_files">[docs]</a><span class="k">def</span> <span class="nf">create_graphviz_files</span><span class="p">(</span><span class="n">inm</span><span class="p">,</span> <span class="n">tps</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write master data to .dot file for use in GVEdit</span>
+<span class="sd">  </span>
+<span class="sd">  Args:</span>
+<span class="sd">    inm (Graph): Graph structure to be written to file</span>
+<span class="sd">    tps (Graph): Graph structure to be written to file</span>
+<span class="sd">    path (String): Path to save the created .dot files</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    float: Void</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+    <span class="n">nx</span><span class="o">.</span><span class="n">draw_graphviz</span><span class="p">(</span><span class="n">inm</span><span class="p">)</span>
+    <span class="n">nx</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">inm</span><span class="p">,</span> <span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;inm/inm.dot&quot;</span><span class="p">)</span>
+    <span class="n">nx</span><span class="o">.</span><span class="n">draw_graphviz</span><span class="p">(</span><span class="n">tps</span><span class="p">)</span>
+    <span class="n">nx</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tps</span><span class="p">,</span> <span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;tps/tps.dot&quot;</span><span class="p">)</span></div>
+
+
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Graph Matching Software 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Peter Holt.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+    </div>
+  </body>
+</html>

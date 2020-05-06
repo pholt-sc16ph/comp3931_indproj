@@ -1,0 +1,359 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>findDiff &#8212; Graph Matching Software 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Graph Matching Software 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for findDiff</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">enum</span>
+
+
+<span class="c1"># Using enum class create enumerations for comparing values of Node names</span>
+<div class="viewcode-block" id="nodeValues"><a class="viewcode-back" href="../findDiff.html#findDiff.nodeValues">[docs]</a><span class="k">class</span> <span class="nc">nodeValues</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+   <span class="n">LimitOfNetwork</span> <span class="o">=</span> <span class="mi">1</span>
+   <span class="n">DummyNode</span> <span class="o">=</span> <span class="mi">2</span>
+   <span class="n">Switch</span> <span class="o">=</span> <span class="mi">3</span>
+   <span class="n">FlatCrossing</span> <span class="o">=</span> <span class="mi">4</span></div>
+
+<span class="c1"># Find differences algorithm. Start with a base graph assuming the base graph is correct. Loop through the nodes and create a dictionary of connections. Do the same for second graph</span>
+<span class="c1"># Algorithm compares dictionaries.</span>
+<span class="c1"># Start at two nodes which are known to be the same one. In the test graphs this is always assumed to be node zero. For any tracsis based graphs a visual check of the graph needs to be</span>
+<span class="c1"># made to identify two points(nodes) which are equivalent from which to start from. These nodes need to be the same type i.e. they have the same amount of neighbours.</span>
+
+<span class="c1"># The algorithm checks the neighbours of the current nodes and assigns equivalence between two nodes which have the same type</span>
+<span class="c1"># This example would give equivalence between node 1 in graph A and node 1 in graph B</span>
+<span class="c1"># Graph A node: 0 || Graph B node: 0</span>
+<span class="c1"># Graph A node 0 neighbours (without previous node, the one we are currently on): [(&#39;1&#39;, &#39;Switch&#39;)] length: 1</span>
+<span class="c1"># Graph B node 0 neighbours (without previous node, the one we are currently on): [(&#39;1&#39;, &#39;Switch&#39;)] length: 1</span>
+<span class="c1"># Nodes which need changing: []</span>
+
+<span class="c1"># The algorithm takes in to account whether two nodes have two edges between them</span>
+<span class="c1"># Graph A node: 1 || Graph B node: 1</span>
+<span class="c1"># Graph A node 1 neighbours (without previous node): [(&#39;3&#39;, &#39;Switch&#39;), (&#39;3&#39;, &#39;Switch&#39;)] length: 2</span>
+<span class="c1"># Graph B node 1 neighbours (without previous node): [(&#39;3&#39;, &#39;Switch&#39;), (&#39;3&#39;, &#39;Switch&#39;)] length: 2</span>
+<span class="c1"># Nodes which need changing: []</span>
+
+<span class="c1"># The algorithm flags when a match can&#39;t me made, this happens when there is a difference in the graph. In this case node 65 in graph A is a LimitOfNetwork but the equivalent</span>
+<span class="c1"># node in graph B is a FlatCrossing. The nodes in question are marked as needing to be changed along with the nodes currently the focus (52 and 52 in this case)</span>
+<span class="c1"># This information is needed to update the base graph with new nodes along with updating the neighbour information of the parent nodes and also adding in any new nodes created.</span>
+<span class="c1"># Example 1</span>
+<span class="c1"># Graph A node: 52 || Graph B node: 52</span>
+<span class="c1"># Graph A node 52 neighbours (without previous node): [(&#39;53&#39;, &#39;FlatCrossing&#39;), (&#39;58&#39;, &#39;FlatCrossing&#39;), (&#39;65&#39;, &#39;LimitOfNetwork&#39;)] length: 3</span>
+<span class="c1"># Graph B node 52 neighbours (without previous node): [(&#39;53&#39;, &#39;FlatCrossing&#39;), (&#39;58&#39;, &#39;FlatCrossing&#39;), (&#39;65&#39;, &#39;FlatCrossing&#39;)] length: 3</span>
+<span class="c1"># Nodes which need changing: [((&#39;65&#39;, &#39;LimitOfNetwork&#39;), (&#39;65&#39;, &#39;FlatCrossing&#39;), &#39;52&#39;, &#39;52&#39;)]</span>
+<span class="c1"># Example 2</span>
+<span class="c1"># Graph A node: 5 || Graph B node: 5</span>
+<span class="c1"># Graph A node 5 neighbours (without previous node): [(&#39;7&#39;, &#39;Switch&#39;), (&#39;9&#39;, &#39;FlatCrossing&#39;)] length: 2</span>
+<span class="c1"># Graph B node 5 neighbours (without previous node): [(&#39;7&#39;, &#39;Switch&#39;), (&#39;6&#39;, &#39;Switch&#39;)] length: 2</span>
+<span class="c1"># Nodes which need changing: [((&#39;9&#39;, &#39;FlatCrossing&#39;), (&#39;6&#39;, &#39;Switch&#39;), &#39;5&#39;, &#39;5&#39;)]</span>
+
+<span class="c1"># When the algorithm flags up a pair of nodes (or in some cases more than one pair) a decision has to be made about what to do with it. As we are assuming that both graphs</span>
+<span class="c1"># are correct from their point of view anything which is going to add extra nodes and information to the base graph need to be added. In the example above, Graph A is expecting </span>
+<span class="c1"># a LimitOfNetwork node but in Graph B the equivalent node is a FlatCrossing.</span>
+<span class="c1"># Using enums, values were assigned to each node type and two checks are completed:</span>
+<span class="c1"># if node in graph B is larger than node in Graph A:</span>
+<span class="c1">#   Change data in Graph A to match data from Graph B and add necessary nodes</span>
+
+<span class="c1"># In example 1, as a FlatCrossing has a higher value than LimitOfNetwork, data from Graph B must be added to Graph A (as it is then assumed this data is missing from Graph A). There</span>
+<span class="c1"># are four steps which need to be completed for this to happen. Change the type of the node in Graph A (&quot;65&quot;) to the type in Graph B, add the neighbours of the node in Graph B to</span>
+<span class="c1"># the neighbour information of Graph A(&quot;65&quot;), add the same neighbours to the actual graph as nodes of their own, and finally update the parent node neighbour information. In</span>
+<span class="c1"># this case node(&quot;52&quot;) thinks its neighbours are (FlatCrossing, FlatCrossing, LimitOfNetwork) when its neighbours are now three FlatCrossings</span>
+
+<span class="c1"># if node in graph B is smaller than node in Graph A:</span>
+<span class="c1">#   This could mean one of two things. The smaller node is the same node but Graph B is missing information which is in graph A in which case no change is needed as the information</span>
+<span class="c1">#   is already in Graph A</span>
+<span class="c1">#   Or, this smaller node is a completely new node in the graph, this can be checked by looking forward in the graph to see if any of its neighbours are the node we were expecting. If</span>
+<span class="c1">#   that node is found, &quot;smaller&quot; node is added to graph A along with it&#39;s neighbours. If this new node is a large branch then the branch information would be added on each loop.</span>
+
+<span class="c1"># In eample 2, Graph A was expecting a FlatCrossing but the node in Graph B was a Switch, by checking the neigbours of the Switch from Graph B, the algorithm identifies that one of its</span>
+<span class="c1"># neighbours is a FlatCrossing and decided that the Switch is a new node. This needs to be added to Graph A by updating the neighbours of nodes &quot;5&quot; and &quot;9&quot; to include the new node and remove</span>
+<span class="c1"># each other as neighbours. The new node (and its neighbours) need to then be added to Graph A.</span>
+
+
+<div class="viewcode-block" id="find_diff"><a class="viewcode-back" href="../findDiff.html#findDiff.find_diff">[docs]</a><span class="k">def</span> <span class="nf">find_diff</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">additional</span><span class="p">,</span> <span class="n">start_node_base</span><span class="p">,</span> <span class="n">start_node_add</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Graph matching algorithm - checks both graphs and calculates equality between nodes to return a super graph comprising nodes from both supplied graphs</span>
+<span class="sd">  Args:</span>
+<span class="sd">    base (Graph): Graph to be the base graph, nodes from additional graph added to this one</span>
+<span class="sd">    additional (Graph): Graph to be the additional graph</span>
+<span class="sd">    start_node_base (String): Node id for start position of base graph</span>
+<span class="sd">    start_node_add (String): Node id for start position of additional graph</span>
+<span class="sd">    </span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    Graph: Super graph which is the result of matching</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">base</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="n">additional</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">()</span>
+    <span class="n">sG</span> <span class="o">=</span> <span class="n">start_node_base</span>
+    <span class="n">sF</span> <span class="o">=</span> <span class="n">start_node_add</span>
+
+    <span class="n">G_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">F_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    
+
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">G</span><span class="p">:</span>
+        <span class="n">neighbours</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+            <span class="n">empty_tuple</span> <span class="o">=</span> <span class="p">()</span>
+            <span class="n">empty_tuple</span> <span class="o">=</span> <span class="n">empty_tuple</span> <span class="o">+</span> <span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+            <span class="n">neighbours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">empty_tuple</span><span class="p">)</span>
+        <span class="n">node_type</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
+        <span class="n">G_dict</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">node_type</span><span class="p">,</span> <span class="s2">&quot;neighbours&quot;</span><span class="p">:</span> <span class="n">neighbours</span><span class="p">}</span>
+    
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">F</span><span class="p">:</span>
+        <span class="n">neighbours</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">F</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+            <span class="n">empty_tuple</span> <span class="o">=</span> <span class="p">()</span>
+            <span class="n">empty_tuple</span> <span class="o">=</span> <span class="n">empty_tuple</span> <span class="o">+</span> <span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">F</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+            <span class="n">neighbours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">empty_tuple</span><span class="p">)</span>
+        <span class="n">node_type</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
+        <span class="n">F_dict</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">node_type</span><span class="p">,</span> <span class="s2">&quot;neighbours&quot;</span><span class="p">:</span> <span class="n">neighbours</span><span class="p">}</span>
+
+    <span class="n">eqiv_nodes</span> <span class="o">=</span> <span class="p">[(</span><span class="n">sG</span><span class="p">,</span> <span class="n">sF</span><span class="p">)]</span>
+    <span class="n">nodes_need_changing</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">eqiv_nodes_visted</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">eqiv_nodes_visted_A</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">eqiv_nodes_visted_B</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1">#The check for equivalence is done by looking at the currently focused nodes and comparing their neighbours. The decisions on whether</span>
+    <span class="c1">#a node pair are equivalent needs to be done before the loop can move on to that pair. If they are evivalent then the sizes of their </span>
+    <span class="c1">#neighbour list is the same</span>
+    <span class="k">for</span> <span class="n">en</span> <span class="ow">in</span> <span class="n">eqiv_nodes</span><span class="p">:</span>
+        <span class="n">node_a</span> <span class="o">=</span> <span class="n">en</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">node_b</span> <span class="o">=</span> <span class="n">en</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">eqiv_nodes_visted</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_a</span><span class="p">,</span> <span class="n">node_b</span><span class="p">))</span>
+        <span class="n">eqiv_nodes_visted_A</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node_a</span><span class="p">)</span>
+        <span class="n">eqiv_nodes_visted_B</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node_b</span><span class="p">)</span>
+        <span class="n">node_a_neighbours</span> <span class="o">=</span> <span class="n">G_dict</span><span class="p">[</span><span class="n">node_a</span><span class="p">][</span><span class="s1">&#39;neighbours&#39;</span><span class="p">]</span>
+        <span class="n">node_a_neighbours_no_previous</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">node_a_neighbours</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">eqiv_nodes_visted_A</span><span class="p">:</span>
+                <span class="n">node_a_neighbours_no_previous</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="n">node_b_neighbours</span> <span class="o">=</span> <span class="n">F_dict</span><span class="p">[</span><span class="n">node_b</span><span class="p">][</span><span class="s1">&#39;neighbours&#39;</span><span class="p">]</span>
+        <span class="n">node_b_neighbours_no_previous</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">node_b_neighbours</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">eqiv_nodes_visted_B</span><span class="p">:</span>
+                <span class="n">node_b_neighbours_no_previous</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+        <span class="n">len_a_neigh</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">node_a_neighbours_no_previous</span><span class="p">)</span>
+        <span class="n">len_b_neigh</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">node_b_neighbours_no_previous</span><span class="p">)</span>
+        
+        <span class="c1">#If neighbour list is of length 1 </span>
+        <span class="k">if</span> <span class="n">len_a_neigh</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span>  <span class="n">len_b_neigh</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">node_A</span> <span class="ow">in</span> <span class="n">node_a_neighbours_no_previous</span><span class="p">[:]:</span>
+                <span class="k">for</span> <span class="n">node_B</span> <span class="ow">in</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">[:]:</span>
+                    <span class="k">if</span> <span class="n">node_A</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">node_B</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">node_A</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">node_B</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">eqiv_nodes</span><span class="p">:</span>
+                            <span class="n">eqiv_nodes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_A</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">node_B</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                            <span class="k">if</span> <span class="n">node_A</span> <span class="ow">in</span> <span class="n">node_a_neighbours_no_previous</span><span class="p">:</span>
+                                <span class="n">node_a_neighbours_no_previous</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node_A</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">node_B</span> <span class="ow">in</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">:</span>
+                                <span class="n">node_b_neighbours_no_previous</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node_B</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">node_A</span> <span class="ow">in</span> <span class="n">node_a_neighbours_no_previous</span><span class="p">:</span>
+                                <span class="n">node_a_neighbours_no_previous</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node_A</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">node_B</span> <span class="ow">in</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">:</span>
+                                <span class="n">node_b_neighbours_no_previous</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node_B</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">node_a_neighbours_no_previous</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span>  <span class="nb">len</span><span class="p">(</span><span class="n">node_b_neighbours_no_previous</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">nodes_need_changing</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_a_neighbours_no_previous</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="c1">#If neighbour list is of length 2 (after previously visited nodes removed)</span>
+        <span class="k">elif</span> <span class="n">len_a_neigh</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span>  <span class="n">len_b_neigh</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1">#First neighbour of Graph A compare with Graph B until match is found</span>
+            <span class="k">for</span> <span class="n">node_A</span> <span class="ow">in</span> <span class="n">node_a_neighbours_no_previous</span><span class="p">[:]:</span>
+                <span class="k">for</span> <span class="n">node_B</span> <span class="ow">in</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">[:]:</span>
+                    <span class="k">if</span> <span class="n">node_A</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">node_B</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">node_A</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">node_B</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">eqiv_nodes</span><span class="p">:</span>
+                            <span class="n">eqiv_nodes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_A</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">node_B</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                            <span class="k">if</span> <span class="n">node_A</span> <span class="ow">in</span> <span class="n">node_a_neighbours_no_previous</span><span class="p">:</span>
+                                <span class="n">node_a_neighbours_no_previous</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node_A</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">node_B</span> <span class="ow">in</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">:</span>
+                                <span class="n">node_b_neighbours_no_previous</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node_B</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">node_A</span> <span class="ow">in</span> <span class="n">node_a_neighbours_no_previous</span><span class="p">:</span>
+                                <span class="n">node_a_neighbours_no_previous</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node_A</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">node_B</span> <span class="ow">in</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">:</span>
+                                <span class="n">node_b_neighbours_no_previous</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node_B</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">node_a_neighbours_no_previous</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span>  <span class="nb">len</span><span class="p">(</span><span class="n">node_b_neighbours_no_previous</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">nodes_need_changing</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_a_neighbours_no_previous</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">nodes_need_changing</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_a_neighbours_no_previous</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">nodes_need_changing</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_a_neighbours_no_previous</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">node_a_neighbours_no_previous</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span>  <span class="nb">len</span><span class="p">(</span><span class="n">node_b_neighbours_no_previous</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">nodes_need_changing</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_a_neighbours_no_previous</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">nodes_need_changing</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_a_neighbours_no_previous</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">node_a_neighbours_no_previous</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span>  <span class="nb">len</span><span class="p">(</span><span class="n">node_b_neighbours_no_previous</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">nodes_need_changing</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_a_neighbours_no_previous</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                
+        <span class="c1">#If neighbour list is of length 3 (after previously visited nodes removed)</span>
+        <span class="k">elif</span> <span class="n">len_a_neigh</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span>  <span class="n">len_b_neigh</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="c1">#First neighbour of Graph A compare with Graph B until match is found</span>
+            <span class="k">for</span> <span class="n">node_A</span> <span class="ow">in</span> <span class="n">node_a_neighbours_no_previous</span><span class="p">[:]:</span>
+                <span class="k">for</span> <span class="n">node_B</span> <span class="ow">in</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">[:]:</span>
+                    <span class="k">if</span> <span class="n">node_A</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">node_B</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">node_A</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">node_B</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">eqiv_nodes</span><span class="p">:</span>
+                            <span class="n">eqiv_nodes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_A</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">node_B</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                            <span class="k">if</span> <span class="n">node_A</span> <span class="ow">in</span> <span class="n">node_a_neighbours_no_previous</span><span class="p">:</span>
+                                <span class="n">node_a_neighbours_no_previous</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node_A</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">node_B</span> <span class="ow">in</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">:</span>
+                                <span class="n">node_b_neighbours_no_previous</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node_B</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">node_A</span> <span class="ow">in</span> <span class="n">node_a_neighbours_no_previous</span><span class="p">:</span>
+                                <span class="n">node_a_neighbours_no_previous</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node_A</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">node_B</span> <span class="ow">in</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">:</span>
+                                <span class="n">node_b_neighbours_no_previous</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node_B</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">node_a_neighbours_no_previous</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span>  <span class="nb">len</span><span class="p">(</span><span class="n">node_b_neighbours_no_previous</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">nodes_need_changing</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_a_neighbours_no_previous</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">nodes_need_changing</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_a_neighbours_no_previous</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">nodes_need_changing</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_a_neighbours_no_previous</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">node_a_neighbours_no_previous</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span>  <span class="nb">len</span><span class="p">(</span><span class="n">node_b_neighbours_no_previous</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">nodes_need_changing</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_a_neighbours_no_previous</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">nodes_need_changing</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_a_neighbours_no_previous</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">node_a_neighbours_no_previous</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span>  <span class="nb">len</span><span class="p">(</span><span class="n">node_b_neighbours_no_previous</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">nodes_need_changing</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_a_neighbours_no_previous</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">node_b_neighbours_no_previous</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">en</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes_need_changing</span><span class="p">[:]:</span>
+            <span class="n">node_a_id</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">node_a_type</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">node_a_parent</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">node_b_id</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">node_b_type</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">node_b_parent</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">neighbours_node_b</span> <span class="o">=</span> <span class="n">F_dict</span><span class="p">[</span><span class="n">node_b_id</span><span class="p">][</span><span class="s1">&#39;neighbours&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">nodeValues</span><span class="p">[</span><span class="n">node_b_type</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="n">nodeValues</span><span class="p">[</span><span class="n">node_a_type</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">G_dict</span><span class="p">[</span><span class="n">node_a_id</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">node_b_type</span>
+                <span class="n">G_dict</span><span class="p">[</span><span class="n">node_a_id</span><span class="p">][</span><span class="s1">&#39;neighbours&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">neighbours_node_b</span>
+                <span class="n">new_set_of_neighbours</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">neighbour</span> <span class="ow">in</span> <span class="n">G_dict</span><span class="p">[</span><span class="n">node_a_parent</span><span class="p">][</span><span class="s1">&#39;neighbours&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">neighbour</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">node_a_id</span> <span class="ow">and</span> <span class="n">neighbour</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">node_b_type</span><span class="p">:</span>
+                        <span class="n">new_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="n">node_a_id</span><span class="p">,</span> <span class="n">node_b_type</span><span class="p">)</span>
+                        <span class="n">new_set_of_neighbours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_tuple</span><span class="p">)</span>                        
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">new_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="n">neighbour</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">neighbour</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                        <span class="n">new_set_of_neighbours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_tuple</span><span class="p">)</span>
+                <span class="n">G_dict</span><span class="p">[</span><span class="n">node_a_parent</span><span class="p">][</span><span class="s1">&#39;neighbours&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_set_of_neighbours</span>
+                <span class="n">neighbours_for_new_node</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">neighbour</span> <span class="ow">in</span> <span class="n">neighbours_node_b</span><span class="p">:</span>
+                    <span class="n">neighbours_for_new_node</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_a_id</span><span class="p">,</span> <span class="n">node_a_type</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">neighbour</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">G_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="n">G_dict</span><span class="p">[</span><span class="n">neighbour</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;neighbours&#39;</span> <span class="p">:</span> <span class="p">[(</span><span class="n">node_a_id</span><span class="p">,</span> <span class="n">node_b_type</span><span class="p">)],</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">neighbour</span><span class="p">[</span><span class="mi">1</span><span class="p">]}</span>
+            <span class="k">if</span> <span class="n">nodeValues</span><span class="p">[</span><span class="n">node_b_type</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">&lt;</span> <span class="n">nodeValues</span><span class="p">[</span><span class="n">node_a_type</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="c1">#there is a new node to be added to the graph look at neighbours of new node, is one the node expected?</span>
+                <span class="k">for</span> <span class="n">neighbour</span> <span class="ow">in</span> <span class="n">neighbours_node_b</span><span class="p">[:]:</span>
+                    <span class="k">if</span> <span class="n">neighbour</span> <span class="o">==</span> <span class="p">(</span><span class="n">node_b_parent</span><span class="p">,</span> <span class="n">F_dict</span><span class="p">[</span><span class="n">node_b_parent</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]):</span>
+                        <span class="n">neighbours_node_b</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">neighbour</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">neighbour</span> <span class="ow">in</span> <span class="n">neighbours_node_b</span><span class="p">[:]:</span>
+                    <span class="k">if</span> <span class="n">neighbour</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">node_a_type</span><span class="p">:</span>
+                        <span class="n">neighbours_for_new_node</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="n">neighbours_for_new_node</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_a_parent</span><span class="p">,</span> <span class="n">G_dict</span><span class="p">[</span><span class="n">node_a_parent</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]))</span> <span class="c1">#parent node</span>
+                        <span class="n">neighbours_for_new_node</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_a_id</span><span class="p">,</span> <span class="n">node_a_type</span><span class="p">))</span> <span class="c1"># expected node</span>
+                        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">neighbours_node_b</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">G_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                                <span class="n">neighbours_for_new_node</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+                                <span class="n">G_dict</span><span class="p">[</span><span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;neighbours&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="n">node_b_id</span><span class="p">,</span> <span class="n">node_b_type</span><span class="p">)]}</span>
+                        <span class="n">G_dict</span><span class="p">[</span><span class="n">node_b_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">node_b_type</span><span class="p">,</span> <span class="s1">&#39;neighbours&#39;</span><span class="p">:</span> <span class="n">neighbours_for_new_node</span><span class="p">}</span>
+                        <span class="k">break</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">dummy</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">old_parent_neigbours</span> <span class="o">=</span> <span class="n">G_dict</span><span class="p">[</span><span class="n">node_a_parent</span><span class="p">][</span><span class="s1">&#39;neighbours&#39;</span><span class="p">]</span>
+                <span class="n">new_set_of_neighbours</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">neighbour</span> <span class="ow">in</span> <span class="n">old_parent_neigbours</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">node_a_id</span><span class="p">,</span> <span class="n">node_a_type</span><span class="p">)</span> <span class="o">!=</span> <span class="n">neighbour</span><span class="p">:</span>
+                        <span class="n">new_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="n">node_a_id</span><span class="p">,</span> <span class="n">node_b_type</span><span class="p">)</span>
+                        <span class="n">new_set_of_neighbours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_tuple</span><span class="p">)</span>                        
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">new_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="n">node_b_id</span><span class="p">,</span> <span class="n">node_b_type</span><span class="p">)</span>
+                        <span class="n">new_set_of_neighbours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_tuple</span><span class="p">)</span>
+                <span class="n">G_dict</span><span class="p">[</span><span class="n">node_a_parent</span><span class="p">][</span><span class="s1">&#39;neigbours&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_set_of_neighbours</span>
+
+        <span class="n">nodes_need_changing</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">G_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">S</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">neighbour</span> <span class="ow">in</span> <span class="n">G_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;neighbours&#39;</span><span class="p">]:</span>
+            <span class="n">edge_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">neighbour</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">edge_tuple</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">:</span>
+                <span class="n">edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">edge_tuple</span><span class="p">)</span>
+    <span class="n">S</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">S</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Graph Matching Software 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Peter Holt.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+    </div>
+  </body>
+</html>

@@ -1,5 +1,19 @@
 {
     "python.pythonPath": "C:\\Users\\peter\\AppData\\Local\\Microsoft\\WindowsApps\\python.exe",
     "restructuredtext.confPath": "${workspaceFolder}\\docs_python\\source",
-    "python.autoComplete.extraPaths": ["${workspaceFolder}\\CreateTestGraphs_Py"]
+    "python.autoComplete.extraPaths": ["${workspaceFolder}\\CreateTestGraphs_Py"],
+    "editor.tokenColorCustomizations": {
+        "textMateRules": [
+            {
+            "scope": "comment",
+            "settings": {
+                "fontStyle": "italic",
+                "foreground": "#02a597"
+            }
+            }
+        ]
+        
+    }
 }
+
+

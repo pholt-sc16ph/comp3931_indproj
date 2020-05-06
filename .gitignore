@@ -14,8 +14,7 @@ Data/MasterCopies_xml/
 Data/tps_unpacked/
 Data/tracsis_master_tests/
 Data/tracsis_tests/
-Data/manual_tests/Graph_A.xml
-Data/manual_tests/Graph_B.xml
+Data/manual_tests/
 TpsDataViewer/
 docs_create/source
 docs_create/make.bat

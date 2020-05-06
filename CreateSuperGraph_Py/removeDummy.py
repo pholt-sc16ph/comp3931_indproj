@@ -2,6 +2,14 @@
 
 #can only call on one graph at a time as can only return one graph at a time. Possible to return an array of graphs
 def remove_dummy(graph):
+    """Remove all the dummy nodes from the graph supplied
+  Args:
+    graph (Graph): Graph structure where dummy nodes removed
+    
+
+  Returns:
+    Graph: Graph which has had dummy nodes removed
+  """
     G = graph
 
     list_of_dummy_nodes = []

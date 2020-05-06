@@ -1,0 +1,189 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>createSuper &#8212; Graph Matching Software 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Graph Matching Software 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for createSuper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">folderManagement</span> <span class="k">as</span> <span class="nn">fM</span>
+<span class="kn">import</span> <span class="nn">createGraph</span> <span class="k">as</span> <span class="nn">cG</span>
+<span class="kn">import</span> <span class="nn">findDiff</span> <span class="k">as</span> <span class="nn">fD</span>
+<span class="kn">import</span> <span class="nn">removeDummy</span> <span class="k">as</span> <span class="nn">rD</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../createSuper.html#createSuper.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Main function - Allows the user to choose which tests they want to perform</span>
+<span class="sd">    </span>
+<span class="sd">  Returns:</span>
+<span class="sd">    float: Void</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+    <span class="c1">#return the folder name of the test to be used</span>
+    <span class="n">choice</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Type &#39;1&#39; to run on test data, &#39;2&#39; to run on Tracsis test data or type &#39;3&#39; to run on Tracsis master data -&gt; &quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">choice</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">test_string</span> <span class="o">=</span> <span class="n">fM</span><span class="o">.</span><span class="n">return_test_name</span><span class="p">()</span>
+        <span class="n">path_to_folder</span> <span class="o">=</span> <span class="s2">&quot;../Data/automated_tests/&quot;</span>
+        <span class="n">start_node_A</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">start_node_B</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">fM</span><span class="o">.</span><span class="n">check_if_GMSCL_folder</span><span class="p">(</span><span class="n">test_string</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Isomorphism check has been ran. Uncompressed data available for use&quot;</span><span class="p">)</span>
+            <span class="n">start_node_A</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Choose start node for base graph -&gt; &quot;</span><span class="p">)</span>
+            <span class="n">start_node_B</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Choose start node for additional graph -&gt; &quot;</span><span class="p">)</span>
+            <span class="n">original_graph</span> <span class="o">=</span> <span class="n">cG</span><span class="o">.</span><span class="n">create_graph</span><span class="p">(</span><span class="n">path_to_folder</span> <span class="o">+</span> <span class="n">test_string</span> <span class="o">+</span> <span class="s2">&quot;/GraphMatchingSoftware_CL/original_graph/Connectivity.xml&quot;</span><span class="p">)</span>
+            <span class="n">edited_graph</span> <span class="o">=</span> <span class="n">cG</span><span class="o">.</span><span class="n">create_graph</span><span class="p">(</span><span class="n">path_to_folder</span> <span class="o">+</span> <span class="n">test_string</span> <span class="o">+</span> <span class="s2">&quot;/GraphMatchingSoftware_CL/edited_graph/Connectivity.xml&quot;</span><span class="p">)</span>
+            <span class="n">dummyless_ori</span> <span class="o">=</span> <span class="n">rD</span><span class="o">.</span><span class="n">remove_dummy</span><span class="p">(</span><span class="n">original_graph</span><span class="p">)</span>
+            <span class="n">dummyless_edi</span> <span class="o">=</span> <span class="n">rD</span><span class="o">.</span><span class="n">remove_dummy</span><span class="p">(</span><span class="n">edited_graph</span><span class="p">)</span>
+            <span class="c1"># cG.display_graphs(dummyless_ori, dummyless_edi)</span>
+            <span class="n">super_graph</span> <span class="o">=</span> <span class="n">fD</span><span class="o">.</span><span class="n">find_diff</span><span class="p">(</span><span class="n">dummyless_ori</span><span class="p">,</span> <span class="n">dummyless_edi</span><span class="p">,</span> <span class="n">start_node_A</span><span class="p">,</span> <span class="n">start_node_B</span><span class="p">)</span>
+            <span class="n">cG</span><span class="o">.</span><span class="n">display_three_graphs</span><span class="p">(</span><span class="n">dummyless_ori</span><span class="p">,</span> <span class="n">dummyless_edi</span><span class="p">,</span> <span class="n">super_graph</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No isomorphism check completed. Extracting usable files&quot;</span><span class="p">)</span>
+            <span class="n">start_node_A</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Choose start node for base graph -&gt; &quot;</span><span class="p">)</span>
+            <span class="n">start_node_B</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Choose start node for additional graph -&gt; &quot;</span><span class="p">)</span>
+            <span class="n">fM</span><span class="o">.</span><span class="n">create_GMSCL_folder</span><span class="p">(</span><span class="n">test_string</span><span class="p">)</span>
+            <span class="n">original_graph</span> <span class="o">=</span> <span class="n">cG</span><span class="o">.</span><span class="n">create_graph</span><span class="p">(</span><span class="n">path_to_folder</span> <span class="o">+</span> <span class="n">test_string</span> <span class="o">+</span> <span class="s2">&quot;/GraphMatchingSoftware_CL/original_graph/Connectivity.xml&quot;</span><span class="p">)</span>
+            <span class="n">edited_graph</span> <span class="o">=</span> <span class="n">cG</span><span class="o">.</span><span class="n">create_graph</span><span class="p">(</span><span class="n">path_to_folder</span> <span class="o">+</span> <span class="n">test_string</span> <span class="o">+</span> <span class="s2">&quot;/GraphMatchingSoftware_CL/edited_graph/Connectivity.xml&quot;</span><span class="p">)</span>
+            <span class="n">dummyless_ori</span> <span class="o">=</span> <span class="n">rD</span><span class="o">.</span><span class="n">remove_dummy</span><span class="p">(</span><span class="n">original_graph</span><span class="p">)</span>
+            <span class="n">dummyless_edi</span> <span class="o">=</span> <span class="n">rD</span><span class="o">.</span><span class="n">remove_dummy</span><span class="p">(</span><span class="n">edited_graph</span><span class="p">)</span>
+            <span class="c1"># cG.display_graphs(dummyless_ori, dummyless_edi)</span>
+            <span class="n">super_graph</span> <span class="o">=</span> <span class="n">fD</span><span class="o">.</span><span class="n">find_diff</span><span class="p">(</span><span class="n">dummyless_ori</span><span class="p">,</span> <span class="n">dummyless_edi</span><span class="p">,</span> <span class="n">start_node_A</span><span class="p">,</span> <span class="n">start_node_B</span><span class="p">)</span>
+            <span class="n">cG</span><span class="o">.</span><span class="n">display_three_graphs</span><span class="p">(</span><span class="n">dummyless_ori</span><span class="p">,</span> <span class="n">dummyless_edi</span><span class="p">,</span> <span class="n">super_graph</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">choice</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">test_string</span> <span class="o">=</span> <span class="n">fM</span><span class="o">.</span><span class="n">return_test_name_tracsis</span><span class="p">()</span>
+        <span class="n">path_to_folder</span> <span class="o">=</span> <span class="s2">&quot;../Data/tracsis_tests/&quot;</span>
+        <span class="n">start_node_A</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">start_node_B</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">fM</span><span class="o">.</span><span class="n">check_if_GMSCL_tracsis_test</span><span class="p">(</span><span class="n">test_string</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Isomorphism check has been ran. Uncompressed data available for use&quot;</span><span class="p">)</span>
+            <span class="n">start_node_A</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Choose start node for base graph -&gt; &quot;</span><span class="p">)</span>
+            <span class="n">start_node_B</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Choose start node for additional graph -&gt; &quot;</span><span class="p">)</span>
+            <span class="n">base_graph</span> <span class="o">=</span> <span class="n">cG</span><span class="o">.</span><span class="n">create_graph</span><span class="p">(</span><span class="n">path_to_folder</span> <span class="o">+</span> <span class="n">test_string</span> <span class="o">+</span> <span class="s2">&quot;/GraphMatchingSoftware_CL/base_graph/Connectivity.xml&quot;</span><span class="p">)</span>
+            <span class="n">additional_graph</span> <span class="o">=</span> <span class="n">cG</span><span class="o">.</span><span class="n">create_graph</span><span class="p">(</span><span class="n">path_to_folder</span> <span class="o">+</span> <span class="n">test_string</span> <span class="o">+</span> <span class="s2">&quot;/GraphMatchingSoftware_CL/additional_graph/Connectivity.xml&quot;</span><span class="p">)</span>
+            <span class="n">dummyless_base</span> <span class="o">=</span> <span class="n">rD</span><span class="o">.</span><span class="n">remove_dummy</span><span class="p">(</span><span class="n">base_graph</span><span class="p">)</span>
+            <span class="n">dummyless_additional</span> <span class="o">=</span> <span class="n">rD</span><span class="o">.</span><span class="n">remove_dummy</span><span class="p">(</span><span class="n">additional_graph</span><span class="p">)</span>
+            <span class="n">cG</span><span class="o">.</span><span class="n">display_graphs</span><span class="p">(</span><span class="n">dummyless_base</span><span class="p">,</span> <span class="n">dummyless_additional</span><span class="p">)</span>
+            <span class="n">super_graph</span> <span class="o">=</span> <span class="n">fD</span><span class="o">.</span><span class="n">find_diff</span><span class="p">(</span><span class="n">dummyless_base</span><span class="p">,</span> <span class="n">dummyless_additional</span><span class="p">,</span> <span class="n">start_node_A</span><span class="p">,</span> <span class="n">start_node_B</span><span class="p">)</span>
+            <span class="c1"># cG.display_three_graphs(dummyless_base, dummyless_additional, super_graph)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No isomorphism check completed. Extracting usable files&quot;</span><span class="p">)</span>
+            <span class="n">start_node_A</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Choose start node for base graph -&gt; &quot;</span><span class="p">)</span>
+            <span class="n">start_node_B</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Choose start node for additional graph -&gt; &quot;</span><span class="p">)</span>
+            <span class="n">fM</span><span class="o">.</span><span class="n">create_GMSCL_tracsis_test</span><span class="p">(</span><span class="n">test_string</span><span class="p">)</span>
+            <span class="n">base_graph</span> <span class="o">=</span> <span class="n">cG</span><span class="o">.</span><span class="n">create_graph</span><span class="p">(</span><span class="n">path_to_folder</span> <span class="o">+</span> <span class="n">test_string</span> <span class="o">+</span> <span class="s2">&quot;/GraphMatchingSoftware_CL/base_graph/Connectivity.xml&quot;</span><span class="p">)</span>
+            <span class="n">additional_graph</span> <span class="o">=</span> <span class="n">cG</span><span class="o">.</span><span class="n">create_graph</span><span class="p">(</span><span class="n">path_to_folder</span> <span class="o">+</span> <span class="n">test_string</span> <span class="o">+</span> <span class="s2">&quot;/GraphMatchingSoftware_CL/additional_graph/Connectivity.xml&quot;</span><span class="p">)</span>
+            <span class="n">dummyless_base</span> <span class="o">=</span> <span class="n">rD</span><span class="o">.</span><span class="n">remove_dummy</span><span class="p">(</span><span class="n">base_graph</span><span class="p">)</span>
+            <span class="n">dummyless_additional</span> <span class="o">=</span> <span class="n">rD</span><span class="o">.</span><span class="n">remove_dummy</span><span class="p">(</span><span class="n">additional_graph</span><span class="p">)</span>
+            <span class="n">cG</span><span class="o">.</span><span class="n">display_graphs</span><span class="p">(</span><span class="n">dummyless_base</span><span class="p">,</span> <span class="n">dummyless_additional</span><span class="p">)</span>
+            <span class="n">super_graph</span> <span class="o">=</span> <span class="n">fD</span><span class="o">.</span><span class="n">find_diff</span><span class="p">(</span><span class="n">dummyless_base</span><span class="p">,</span> <span class="n">dummyless_additional</span><span class="p">,</span> <span class="n">start_node_A</span><span class="p">,</span> <span class="n">start_node_B</span><span class="p">)</span>
+            <span class="c1"># cG.display_three_graphs(dummyless_base, dummyless_additional, super_graph)</span>
+
+    <span class="k">elif</span> <span class="n">choice</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;using Tracsis data&quot;</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;C:/Users/peter/Source/Repos/pholt-sc16ph/comp3931_indproj/Data/tracsis_master_tests/GraphMatchingSoftware_CL/&quot;</span>
+        <span class="n">start_node_A</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">start_node_B</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">fM</span><span class="o">.</span><span class="n">check_if_GMSCL_tracsis</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Isomorphism check has been ran. Uncompressed data available for use&quot;</span><span class="p">)</span>
+            <span class="n">start_node_A</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Choose start node for base graph -&gt; &quot;</span><span class="p">)</span>
+            <span class="n">start_node_B</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Choose start node for additional graph -&gt; &quot;</span><span class="p">)</span>
+            <span class="n">inm_graph</span> <span class="o">=</span> <span class="n">cG</span><span class="o">.</span><span class="n">create_graph</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;inm/Connectivity.xml&quot;</span><span class="p">)</span>
+            <span class="n">tps_graph</span> <span class="o">=</span> <span class="n">cG</span><span class="o">.</span><span class="n">create_graph</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;tps/Connectivity.xml&quot;</span><span class="p">)</span>
+            <span class="n">dummyless_inm</span> <span class="o">=</span> <span class="n">rD</span><span class="o">.</span><span class="n">remove_dummy</span><span class="p">(</span><span class="n">inm_graph</span><span class="p">)</span>
+            <span class="n">dummyless_tps</span> <span class="o">=</span> <span class="n">rD</span><span class="o">.</span><span class="n">remove_dummy</span><span class="p">(</span><span class="n">tps_graph</span><span class="p">)</span>
+            
+            <span class="n">super_graph</span> <span class="o">=</span> <span class="n">fD</span><span class="o">.</span><span class="n">find_diff</span><span class="p">(</span><span class="n">dummyless_inm</span><span class="p">,</span> <span class="n">dummyless_tps</span><span class="p">,</span> <span class="n">start_node_A</span><span class="p">,</span> <span class="n">start_node_B</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No isomorphism check completed. Extracting usable files&quot;</span><span class="p">)</span>
+            <span class="n">start_node_A</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Choose start node for base graph -&gt; &quot;</span><span class="p">)</span>
+            <span class="n">start_node_B</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Choose start node for additional graph -&gt; &quot;</span><span class="p">)</span>
+            <span class="n">fM</span><span class="o">.</span><span class="n">create_GMSCL_tracsis</span><span class="p">()</span>
+
+            <span class="n">inm_graph</span> <span class="o">=</span> <span class="n">cG</span><span class="o">.</span><span class="n">create_graph</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;inm/Connectivity.xml&quot;</span><span class="p">)</span>
+            <span class="n">tps_graph</span> <span class="o">=</span> <span class="n">cG</span><span class="o">.</span><span class="n">create_graph</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;tps/Connectivity.xml&quot;</span><span class="p">)</span>
+            <span class="n">dummyless_inm</span> <span class="o">=</span> <span class="n">rD</span><span class="o">.</span><span class="n">remove_dummy</span><span class="p">(</span><span class="n">inm_graph</span><span class="p">)</span>
+            <span class="n">dummyless_tps</span> <span class="o">=</span> <span class="n">rD</span><span class="o">.</span><span class="n">remove_dummy</span><span class="p">(</span><span class="n">tps_graph</span><span class="p">)</span>
+            
+            <span class="n">super_graph</span> <span class="o">=</span> <span class="n">fD</span><span class="o">.</span><span class="n">find_diff</span><span class="p">(</span><span class="n">dummyless_inm</span><span class="p">,</span> <span class="n">dummyless_tps</span><span class="p">,</span> <span class="n">start_node_A</span><span class="p">,</span> <span class="n">start_node_B</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;please enter either &#39;1&#39;, &#39;2&#39; or &#39;3&#39;&quot;</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Graph Matching Software 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Peter Holt.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+    </div>
+  </body>
+</html>

@@ -20,16 +20,6 @@ from writeInfo import print_info, write_json_file, write_text_file
 
 def main():
 
-    """While loop to keep the program running and to accept user input so that the test sets can be generated as an when they are needed.
-    The program will create one graph randomly using the data supplied which is then used to create the files to be read by TPSDataviewer.
-    The graph which is produced is then edited slightly so as to create another set of files which can be read by TPSDataviewer but with a number of 
-    differences (requested by the user)
-    For example :
-    User requests a graph with 3 switches and 3 crossings, this might produce a graph with 3 limit of networks. If the user selects one difference, 
-    then one of these limits is changed into a switch or a crossing and the required number of limit of network nodes are added. This then produces a
-    set of two graphs which are basically the same with minor differences.
-    The data sets can be made complex with many differences which should represent the final data set to be worked on
-    """
     switch_number = 0
     crossing_number = 0
     number_differences = 0
@@ -44,7 +34,17 @@ def main():
         crossing_number = input ("Choose number of crossing nodes in original graph: ")
         number_differences = input ("Choose the number of differences between original graph and edited graph: ")
         break  
-
+    
+    """While loop to keep the program running and to accept user input so that the test sets can be generated as an when they are needed.
+    The program will create one graph randomly using the data supplied which is then used to create the files to be read by TPSDataviewer.
+    The graph which is produced is then edited slightly so as to create another set of files which can be read by TPSDataviewer but with a number of 
+    differences (requested by the user)
+    For example :
+    User requests a graph with 3 switches and 3 crossings, this might produce a graph with 3 limit of networks. If the user selects one difference, 
+    then one of these limits is changed into a switch or a crossing and the required number of limit of network nodes are added. This then produces a
+    set of two graphs which are basically the same with minor differences.
+    The data sets can be made complex with many differences which should represent the final data set to be worked on
+    """
     """
     Create original graph and write to a new folder in /Data/automated_tests. The new folder will be named to detail the
     graphs it contains. An example folder name would be:
